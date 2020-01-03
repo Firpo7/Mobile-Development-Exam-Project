@@ -4,17 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.location.Location
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import com.loopj.android.http.AsyncHttpClient
 import com.loopj.android.http.JsonHttpResponseHandler
 import cz.msebera.android.httpclient.Header
@@ -74,11 +70,11 @@ class MainActivity : BaseActivity() {
                         }
                     }
             } else {
-                showToast("Turn on location", Toast.LENGTH_LONG)
+                showToast("Turn on location")
             }
         } else {
             Log.d("PERMISSIONS NOT GRANTED", "NO NO")
-            showToast("Permissions not granted", Toast.LENGTH_LONG)
+            showToast("Permissions not granted")
             requestPermissions()
         }
 
@@ -130,7 +126,7 @@ class MainActivity : BaseActivity() {
                 if(jsonObject != null) {
                     Log.d("QUERY", jsonObject.toString())
 
-                    val arr = jsonObject.getJSONArray("data");
+                    val arr = jsonObject.getJSONArray("data")
                     for ( i in 0 until arr.length())
                     {
                         val d = arr.getJSONObject(i)
@@ -146,7 +142,7 @@ class MainActivity : BaseActivity() {
             }
 
             override fun onFailure(statusCode: Int, headers: Array<Header>?, e: Throwable, jsonObject: JSONObject?) {
-                Log.e("QUERY failed", "${statusCode} ${e.message}")
+                Log.e("QUERY failed", "$statusCode ${e.message}")
             }
         })
 

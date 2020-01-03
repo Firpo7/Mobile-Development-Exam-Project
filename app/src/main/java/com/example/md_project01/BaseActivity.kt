@@ -3,6 +3,7 @@ package com.example.md_project01
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,7 +11,6 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import java.time.Duration
 
 open class BaseActivity : AppCompatActivity() {
 
@@ -20,16 +20,12 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     protected fun checkPermissions(): Boolean {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            return true
-        }
-        return false
+        return (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
     }
 
     protected fun requestPermissions() {
@@ -44,19 +40,31 @@ open class BaseActivity : AppCompatActivity() {
         if (requestCode == REQUEST_PERMISSION_LOCATION_ID) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // Granted. Start getting the location information
+                return
             }
         }
     }
 
     protected fun isLocationEnabled(): Boolean {
-        var locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER
         )
     }
 
-    fun showToast(msg: String?, duration: Int ) {
-        if (msg != null)
-            Toast.makeText(this, msg, duration).show()
+    protected fun getLocationWithCallback(callback: ( location: Location? ) -> Unit) {
+        if (checkPermissions()) {
+            if (isLocationEnabled()) {
+                fusedLocationClient.lastLocation
+                    .addOnSuccessListener { location: Location? ->
+                        callback(location)
+                    }
+            }
+        }
+    }
+
+    fun showToast(msg: String?) {
+        if (msg != null && msg.isNotEmpty())
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
     }
 }
