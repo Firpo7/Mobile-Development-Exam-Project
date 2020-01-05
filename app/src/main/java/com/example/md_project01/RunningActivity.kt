@@ -26,8 +26,6 @@ class RunningActivity : BaseActivity() {
     private var distance = 0.0
     private lateinit var locationDisplay: LocationDisplay
 
-    private val UPDATE_INTERVAL_MS: Long = 1000
-    private val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
     private var locationCallback: LocationCallback? = null
     private lateinit var locationRequest: LocationRequest
     //private val locationSettingsRequest: LocationSettingsRequest? = null
@@ -93,24 +91,6 @@ class RunningActivity : BaseActivity() {
             findViewById<TextView>(R.id.runningactivity_textview_distance).text = distance.toInt().toString()
     }
 
-    private fun getStepDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
-        val earthRadius = 6371000.0 //meters
-        val dLat = Math.toRadians((lat2 - lat1))
-        val dLng = Math.toRadians((lng2 - lng1))
-        val a =
-            sin(dLat / 2) * sin(dLat / 2) + cos(Math.toRadians(lat1)) * cos(
-                Math.toRadians(lat2)
-            ) *
-                    sin(dLng / 2) * sin(dLng / 2)
-        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        return (earthRadius * c)
-    }
-
-    private fun getStepDistance(prev: Location, new: Location): Double {
-        return getStepDistance(lat1 = prev.latitude, lat2 = new.latitude, lng1 = prev.longitude, lng2 =  new.longitude)
-    }
-
     private fun updateDistance(location: Location?) {
         if (location != null) {
             if(::lastLocation.isInitialized) {
@@ -126,16 +106,15 @@ class RunningActivity : BaseActivity() {
     }
 
     fun startRunning(@Suppress("UNUSED_PARAMETER")v: View) {
-        locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
         if (!locationDisplay.isStarted)
+            locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
             locationDisplay.startAsync()
-
-        fusedLocationClient.requestLocationUpdates(this.locationRequest,
-            this.locationCallback, Looper.myLooper())
+            fusedLocationClient.requestLocationUpdates(this.locationRequest, this.locationCallback, Looper.myLooper())
     }
 
     fun stopRunning(@Suppress("UNUSED_PARAMETER") view: View) {
         shutdownScheduledTask()
+        locationDisplay.stop()
     }
 
     //DEBUG FUNCTION
@@ -156,6 +135,28 @@ class RunningActivity : BaseActivity() {
             }
         } else {
             requestPermissions()
+        }
+    }
+
+    companion object {
+        private val UPDATE_INTERVAL_MS: Long = 1000
+        private val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
+        private fun getStepDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
+            val earthRadius = 6371000.0 //meters
+            val dLat = Math.toRadians((lat2 - lat1))
+            val dLng = Math.toRadians((lng2 - lng1))
+            val a =
+                sin(dLat / 2) * sin(dLat / 2) + cos(Math.toRadians(lat1)) * cos(
+                    Math.toRadians(lat2)
+                ) *
+                        sin(dLng / 2) * sin(dLng / 2)
+            val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+            return (earthRadius * c)
+        }
+
+        private fun getStepDistance(prev: Location, new: Location): Double {
+            return getStepDistance(lat1 = prev.latitude, lat2 = new.latitude, lng1 = prev.longitude, lng2 =  new.longitude)
         }
     }
 }

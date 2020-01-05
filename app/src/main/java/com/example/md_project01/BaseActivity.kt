@@ -3,6 +3,7 @@ package com.example.md_project01
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -14,7 +15,6 @@ import com.google.android.gms.location.*
 
 open class BaseActivity : AppCompatActivity() {
 
-    private val REQUEST_PERMISSION_LOCATION_ID = 42
     lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +36,8 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == REQUEST_PERMISSION_LOCATION_ID) {
+        if (requestCode ==
+            REQUEST_PERMISSION_LOCATION_ID) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // Granted. Start getting the location information
                 return
@@ -67,5 +68,12 @@ open class BaseActivity : AppCompatActivity() {
     fun showToast(msg: String?) {
         if (msg != null && msg.isNotEmpty())
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+    }
+
+    companion object {
+        private val REQUEST_PERMISSION_LOCATION_ID = 42
+
+        val Int.dp: Int get() = (this / Resources.getSystem().displayMetrics.density).toInt()
+        val Int.px: Int get() = (this * Resources.getSystem().displayMetrics.density).toInt()
     }
 }

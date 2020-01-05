@@ -16,9 +16,6 @@ import kotlin.collections.ArrayList
 
 class MainActivity : BaseActivity() {
 
-    //val Int.dp: Int get() = (this / Resources.getSystem().displayMetrics.density).toInt()
-    val Int.px: Int get() = (this * Resources.getSystem().displayMetrics.density).toInt()
-
     val DAY_LAYOUTS: IntArray = intArrayOf(R.id.day0,R.id.day1,R.id.day2,R.id.day3,R.id.day4,R.id.day5,R.id.day6)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +42,6 @@ class MainActivity : BaseActivity() {
         }
 
         getLocationWithCallback( ::doForecast )
-
     }
 
     private fun getDayName(i: Int): String {
@@ -88,8 +84,7 @@ class MainActivity : BaseActivity() {
 
     private fun doForecast(location: Location?) {
         if(location != null) {
-            val weatherService = QueryWeatherService()
-            weatherService.doForecast(location.latitude, location.longitude, ::setImageViews)
+            QueryWeatherService().doForecast(location.latitude, location.longitude, ::setImageViews)
         }
     }
 
