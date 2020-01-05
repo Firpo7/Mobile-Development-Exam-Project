@@ -2,18 +2,22 @@ package com.example.md_project01
 
 import android.location.Location
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.esri.arcgisruntime.mapping.ArcGISMap
 import com.esri.arcgisruntime.mapping.Basemap
-import kotlinx.android.synthetic.main.activity_running.*
 import com.esri.arcgisruntime.mapping.view.LocationDisplay
 import com.esri.arcgisruntime.mapping.view.WrapAroundMode
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
-import kotlin.math.*
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import kotlinx.android.synthetic.main.activity_running.*
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 class RunningActivity : BaseActivity() {
@@ -21,7 +25,12 @@ class RunningActivity : BaseActivity() {
     private lateinit var lastLocation: Location
     private var distance = 0.0
     private lateinit var locationDisplay: LocationDisplay
-    private lateinit var scheduleTaskExecutor: ScheduledExecutorService
+
+    private val UPDATE_INTERVAL_MS: Long = 1000
+    private val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
+    private var locationCallback: LocationCallback? = null
+    private lateinit var locationRequest: LocationRequest
+    //private val locationSettingsRequest: LocationSettingsRequest? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +38,18 @@ class RunningActivity : BaseActivity() {
         
         getLocationWithCallback ( ::initializeMap )
 
-        scheduleTaskExecutor = Executors.newScheduledThreadPool(1)
+        this.locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult) // why? this. is. retarded. Android.
+                updateDistance(locationResult.lastLocation)
+            }
+        }
+
+        locationRequest = LocationRequest()
+        locationRequest.interval = UPDATE_INTERVAL_MS
+        locationRequest.fastestInterval = FASTEST_UPDATE_INTERVAL_MS
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+
     }
 
     override fun onPause() {
@@ -47,8 +67,7 @@ class RunningActivity : BaseActivity() {
     }
 
     private fun shutdownScheduledTask() {
-        if( !scheduleTaskExecutor.isShutdown && !scheduleTaskExecutor.isTerminated)
-            scheduleTaskExecutor.shutdown()
+        fusedLocationClient.removeLocationUpdates(this.locationCallback)
     }
 
     private fun initializeMap(location: Location?) {
@@ -111,13 +130,8 @@ class RunningActivity : BaseActivity() {
         if (!locationDisplay.isStarted)
             locationDisplay.startAsync()
 
-        /*This schedules a runnable task every second*/
-        scheduleTaskExecutor.scheduleAtFixedRate( {
-            runOnUiThread {
-                getLocationWithCallback( ::updateDistance )
-            }
-        }, 0, 5, TimeUnit.SECONDS)
-
+        fusedLocationClient.requestLocationUpdates(this.locationRequest,
+            this.locationCallback, Looper.myLooper())
     }
 
     fun stopRunning(@Suppress("UNUSED_PARAMETER") view: View) {
