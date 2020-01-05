@@ -28,6 +28,8 @@ class RunningActivity : BaseActivity() {
 
     private var locationCallback: LocationCallback? = null
     private lateinit var locationRequest: LocationRequest
+
+    private var pathService: PathService? = null
     //private val locationSettingsRequest: LocationSettingsRequest? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,6 +95,7 @@ class RunningActivity : BaseActivity() {
 
     private fun updateDistance(location: Location?) {
         if (location != null) {
+            pathService?.addPoint(location)
             if(::lastLocation.isInitialized) {
                 distance += getStepDistance(lastLocation, location)
                 lastLocation = location
@@ -106,20 +109,39 @@ class RunningActivity : BaseActivity() {
     }
 
     fun startRunning(@Suppress("UNUSED_PARAMETER")v: View) {
-        if (!locationDisplay.isStarted)
+        if (!locationDisplay.isStarted) {
+            pathService = PathService(System.currentTimeMillis(), this.applicationContext)
             locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
             locationDisplay.startAsync()
-            fusedLocationClient.requestLocationUpdates(this.locationRequest, this.locationCallback, Looper.myLooper())
+            fusedLocationClient.requestLocationUpdates(
+                this.locationRequest,
+                this.locationCallback,
+                Looper.myLooper()
+            )
+        }
+    }
+
+    private fun savePathMade() {
+        if(checkPermissions(REQUEST_PERMISSION_READWRITE_ID)) {
+            if (pathService != null) {
+                if (pathService!!.save(distance.toLong()).not())
+                    showToast("ERROR WHILE WRITING THE FILE")
+            }
+            requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
+        }
     }
 
     fun stopRunning(@Suppress("UNUSED_PARAMETER") view: View) {
-        shutdownScheduledTask()
-        locationDisplay.stop()
+        if ( locationDisplay.isStarted ) {
+            shutdownScheduledTask()
+            savePathMade()
+            locationDisplay.stop()
+        }
     }
 
     //DEBUG FUNCTION
     fun checkGetLocation(@Suppress("UNUSED_PARAMETER")view: View) {
-        if (checkPermissions()) {
+        if (checkPermissions(REQUEST_PERMISSION_LOCATION_ID)) {
             if (isLocationEnabled()) {
                 fusedLocationClient.lastLocation
                     .addOnSuccessListener { location: Location? ->
@@ -134,13 +156,14 @@ class RunningActivity : BaseActivity() {
                     }
             }
         } else {
-            requestPermissions()
+            requestPermissions(REQUEST_PERMISSION_LOCATION_ID)
         }
     }
 
     companion object {
         private const val UPDATE_INTERVAL_MS: Long = 1000
         private const val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
+
         private fun getStepDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
             val earthRadius = 6371000.0 //meters
             val dLat = Math.toRadians((lat2 - lat1))

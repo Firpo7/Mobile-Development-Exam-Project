@@ -22,16 +22,30 @@ open class BaseActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
-    protected fun checkPermissions(): Boolean {
-        return (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+    protected fun checkPermissions(permission: Int): Boolean {
+        return when(permission){
+            REQUEST_PERMISSION_READWRITE_ID -> (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+            REQUEST_PERMISSION_LOCATION_ID -> (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            else -> false
+        }
     }
 
-    protected fun requestPermissions() {
+    protected fun requestPermissions(code: Int) {
+        val permissions = when(code) {
+            REQUEST_PERMISSION_READWRITE_ID -> arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+            REQUEST_PERMISSION_LOCATION_ID -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            else -> arrayOf()
+        }
+
+        if(permissions.isEmpty())
+            return
+
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_PERMISSION_LOCATION_ID
+            permissions,
+            code
         )
     }
 
@@ -53,7 +67,7 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     protected fun getLocationWithCallback(callback: ( location: Location? ) -> Unit) {
-        if (checkPermissions()) {
+        if (checkPermissions(REQUEST_PERMISSION_LOCATION_ID)) {
             if (isLocationEnabled()) {
                 fusedLocationClient.lastLocation
                     .addOnSuccessListener { location: Location? ->
@@ -61,7 +75,7 @@ open class BaseActivity : AppCompatActivity() {
                     }
             }
         } else {
-            requestPermissions()
+            requestPermissions(REQUEST_PERMISSION_LOCATION_ID)
         }
     }
 
@@ -71,7 +85,8 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val REQUEST_PERMISSION_LOCATION_ID = 42
+        const val REQUEST_PERMISSION_LOCATION_ID = 42
+        const val REQUEST_PERMISSION_READWRITE_ID = 1337
 
         val Int.dp: Int get() = (this / Resources.getSystem().displayMetrics.density).toInt()
         val Int.px: Int get() = (this * Resources.getSystem().displayMetrics.density).toInt()
