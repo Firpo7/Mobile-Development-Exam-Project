@@ -43,7 +43,6 @@ class QueryWeatherService() {
 
     }
 
-
     fun doForecast(lat: Double, lon: Double, callback: (result: ArrayList<String>) -> Unit) {
         val forgeURL = "${BASE_URL}?days=${DAYS_TO_QUERY}&lat=${lat}&lon=${lon}&key=${WEATHERBIT_TOKEN}"
         performRequest(forgeURL, callback)

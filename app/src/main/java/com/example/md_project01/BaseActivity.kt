@@ -60,6 +60,8 @@ open class BaseActivity : AppCompatActivity() {
                         callback(location)
                     }
             }
+        } else {
+            requestPermissions()
         }
     }
 

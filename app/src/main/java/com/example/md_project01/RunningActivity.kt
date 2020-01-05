@@ -43,6 +43,12 @@ class RunningActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mapView.dispose()
+        shutdownScheduledTask()
+    }
+
+    private fun shutdownScheduledTask() {
+        if( !scheduleTaskExecutor.isShutdown && !scheduleTaskExecutor.isTerminated)
+            scheduleTaskExecutor.shutdown()
     }
 
     private fun initializeMap(location: Location?) {
@@ -115,8 +121,7 @@ class RunningActivity : BaseActivity() {
     }
 
     fun stopRunning(@Suppress("UNUSED_PARAMETER") view: View) {
-        if( !scheduleTaskExecutor.isShutdown && !scheduleTaskExecutor.isTerminated)
-            scheduleTaskExecutor.shutdown()
+        shutdownScheduledTask()
     }
 
     //DEBUG FUNCTION
@@ -135,6 +140,8 @@ class RunningActivity : BaseActivity() {
                         )
                     }
             }
+        } else {
+            requestPermissions()
         }
     }
 }
