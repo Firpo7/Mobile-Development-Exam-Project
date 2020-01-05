@@ -139,8 +139,8 @@ class RunningActivity : BaseActivity() {
     }
 
     companion object {
-        private val UPDATE_INTERVAL_MS: Long = 1000
-        private val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
+        private const val UPDATE_INTERVAL_MS: Long = 1000
+        private const val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
         private fun getStepDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
             val earthRadius = 6371000.0 //meters
             val dLat = Math.toRadians((lat2 - lat1))

@@ -71,7 +71,7 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val REQUEST_PERMISSION_LOCATION_ID = 42
+        private const val REQUEST_PERMISSION_LOCATION_ID = 42
 
         val Int.dp: Int get() = (this / Resources.getSystem().displayMetrics.density).toInt()
         val Int.px: Int get() = (this * Resources.getSystem().displayMetrics.density).toInt()

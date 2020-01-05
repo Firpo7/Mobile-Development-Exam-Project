@@ -84,7 +84,7 @@ class MainActivity : BaseActivity() {
 
     private fun doForecast(location: Location?) {
         if(location != null) {
-            QueryWeatherService().doForecast(location.latitude, location.longitude, ::setImageViews)
+            QueryWeatherService.doForecast(location.latitude, location.longitude, ::setImageViews)
         }
     }
 
