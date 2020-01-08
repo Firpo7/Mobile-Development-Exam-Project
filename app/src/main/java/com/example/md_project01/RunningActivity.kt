@@ -106,15 +106,22 @@ class RunningActivity : BaseActivity() {
     }
 
     fun startRunning(@Suppress("UNUSED_PARAMETER")v: View) {
-        if (!locationDisplay.isStarted)
-            locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
+        if(::locationDisplay.isInitialized) {
+            if (!locationDisplay.isStarted)
+                locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
             locationDisplay.startAsync()
             fusedLocationClient.requestLocationUpdates(this.locationRequest, this.locationCallback, Looper.myLooper())
+        }
+        else {
+            //TODO: do something better
+            showToast("Unable to start running, is location enable?")
+        }
     }
 
     fun stopRunning(@Suppress("UNUSED_PARAMETER") view: View) {
         shutdownScheduledTask()
-        locationDisplay.stop()
+        if(::locationDisplay.isInitialized)
+            locationDisplay.stop()
     }
 
     //DEBUG FUNCTION

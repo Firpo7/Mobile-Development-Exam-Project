@@ -60,6 +60,10 @@ open class BaseActivity : AppCompatActivity() {
                         callback(location)
                     }
             }
+            else {
+                //TODO: show something better?
+                showToast("Enable location to see weather and position")
+            }
         } else {
             requestPermissions()
         }
