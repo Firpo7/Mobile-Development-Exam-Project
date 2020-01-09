@@ -14,10 +14,6 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import kotlinx.android.synthetic.main.activity_running.*
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 
 class RunningActivity : BaseActivity() {
@@ -105,7 +101,7 @@ class RunningActivity : BaseActivity() {
         setDistanceTextView(distance)
     }
 
-    fun startRunning(@Suppress("UNUSED_PARAMETER")v: View) {
+    fun startRunning(@Suppress("UNUSED_PARAMETER") v: View) {
         if(::locationDisplay.isInitialized) {
             if (!locationDisplay.isStarted)
                 locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
@@ -148,22 +144,6 @@ class RunningActivity : BaseActivity() {
     companion object {
         private const val UPDATE_INTERVAL_MS: Long = 1000
         private const val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
-        private fun getStepDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
-            val earthRadius = 6371000.0 //meters
-            val dLat = Math.toRadians((lat2 - lat1))
-            val dLng = Math.toRadians((lng2 - lng1))
-            val a =
-                sin(dLat / 2) * sin(dLat / 2) + cos(Math.toRadians(lat1)) * cos(
-                    Math.toRadians(lat2)
-                ) *
-                        sin(dLng / 2) * sin(dLng / 2)
-            val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
-            return (earthRadius * c)
-        }
-
-        private fun getStepDistance(prev: Location, new: Location): Double {
-            return getStepDistance(lat1 = prev.latitude, lat2 = new.latitude, lng1 = prev.longitude, lng2 =  new.longitude)
-        }
     }
 }

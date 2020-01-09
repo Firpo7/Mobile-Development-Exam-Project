@@ -11,6 +11,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 open class BaseActivity : AppCompatActivity() {
@@ -69,6 +73,18 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    protected fun parseStringToForecastsList(s: String): ArrayList<String> {
+        val ret = ArrayList<String>()
+        if(s.length > 4) {
+            val rgx = REGEX_FORECAST_CODES
+            var m = rgx.find(s)
+            do {
+                ret.add(m?.value.toString())
+            } while ({ m = m?.next(); m }() != null)
+        }
+        return ret
+    }
+
     fun showToast(msg: String?) {
         if (msg != null && msg.isNotEmpty())
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
@@ -76,8 +92,34 @@ open class BaseActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_PERMISSION_LOCATION_ID = 42
+        val REGEX_FORECAST_CODES = "[acdfrstu][0-9]{2}[dn]".toRegex()
+        const val DELAY_FORECAST = 1000 * 60 * 60 * 6 // 6 hours in milliseconds
+        const val MAX_DISTANCE_SAME_FORECAST = 5000
+        const val PREFS = "prefs"
+        const val PREF_LATITUDE = "latitudeForecast"
+        const val PREF_LONGITUDE = "longitudeForecast"
+        const val PREF_TIME_LAST_FORECAST = "timeLastForecast"
+        const val PREF_FORECAST = "forecast"
 
         val Int.dp: Int get() = (this / Resources.getSystem().displayMetrics.density).toInt()
         val Int.px: Int get() = (this * Resources.getSystem().displayMetrics.density).toInt()
+
+        fun getStepDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
+            val earthRadius = 6371000.0 //meters
+            val dLat = Math.toRadians((lat2 - lat1))
+            val dLng = Math.toRadians((lng2 - lng1))
+            val a =
+                sin(dLat / 2) * sin(dLat / 2) + cos(Math.toRadians(lat1)) * cos(
+                    Math.toRadians(lat2)
+                ) *
+                        sin(dLng / 2) * sin(dLng / 2)
+            val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+            return (earthRadius * c)
+        }
+
+        fun getStepDistance(prev: Location, new: Location): Double {
+            return getStepDistance(lat1 = prev.latitude, lat2 = new.latitude, lng1 = prev.longitude, lng2 =  new.longitude)
+        }
     }
 }
