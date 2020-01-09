@@ -30,7 +30,9 @@ class RunningActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_running)
         
-        getLocationWithCallback ( ::initializeMap )
+        getLocationWithCallback { location: Location? ->
+            initializeMap(location)
+        }
 
         this.locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {

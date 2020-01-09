@@ -137,7 +137,9 @@ class MainActivity : BaseActivity() {
     }
 
     private fun updateForecast(){
-        getLocationWithCallback( ::doForecast )
+        getLocationWithCallback { location: Location? ->
+            doForecast(location)
+        }
     }
 
     fun startRunPressed(@Suppress("UNUSED_PARAMETER") view: View) {
