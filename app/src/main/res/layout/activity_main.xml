@@ -23,13 +23,14 @@
 
             <TextView
                 android:id="@+id/weekday_0"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="center" />
 
             <ImageView
                 android:id="@+id/forecastday_0"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:srcCompat="@drawable/sunny_day" />
         </FrameLayout>
@@ -41,13 +42,14 @@
 
             <TextView
                 android:id="@+id/weekday_1"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="center"/>
 
             <ImageView
                 android:id="@+id/forecastday_1"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:srcCompat="@drawable/sunny_day" />
         </FrameLayout>
@@ -59,13 +61,14 @@
 
             <TextView
                 android:id="@+id/weekday_2"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="center"/>
 
             <ImageView
                 android:id="@+id/forecastday_2"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:srcCompat="@drawable/sunny_day" />
         </FrameLayout>
@@ -77,31 +80,33 @@
 
             <TextView
                 android:id="@+id/weekday_3"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="center"/>
 
             <ImageView
                 android:id="@+id/forecastday_3"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:srcCompat="@drawable/sunny_day" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/day4"
-            android:layout_width="60dp"
+            android:layout_width="58dp"
             android:layout_height="60dp">
 
             <TextView
                 android:id="@+id/weekday_4"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="center"/>
 
             <ImageView
                 android:id="@+id/forecastday_4"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:srcCompat="@drawable/sunny_day" />
 
@@ -109,36 +114,38 @@
 
         <FrameLayout
             android:id="@+id/day5"
-            android:layout_width="60dp"
+            android:layout_width="59dp"
             android:layout_height="60dp">
 
             <TextView
                 android:id="@+id/weekday_5"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="center"/>
 
             <ImageView
                 android:id="@+id/forecastday_5"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:srcCompat="@drawable/sunny_day" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/day6"
-            android:layout_width="60dp"
+            android:layout_width="59dp"
             android:layout_height="60dp">
 
             <TextView
                 android:id="@+id/weekday_6"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="TextView"
+                android:textAlignment="center" />
 
             <ImageView
                 android:id="@+id/forecastday_6"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:srcCompat="@drawable/sunny_day" />
         </FrameLayout>

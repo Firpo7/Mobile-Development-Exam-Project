@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MD-project01</string>
+
+    <string name="runningactivity_textview_distance"> Distance: </string>
+    <string name="runningactivity_button_start">START</string>
+    <string name="runningactivity_button_stop">STOP</string>
+
 </resources>

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.esri.arcgisruntime.geometry.PointCollection
@@ -40,7 +41,9 @@ class RunningActivity : BaseActivity() {
     private lateinit var graphicsOverlay: GraphicsOverlay
     private var lastGraphic: Graphic? = null
 
+    @Volatile
     private var pathService: PathService? = null
+    private var currentButtonState: ButtonState = ButtonState.START
     //private val locationSettingsRequest: LocationSettingsRequest? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,15 +87,13 @@ class RunningActivity : BaseActivity() {
     }
 
     private fun initializeMap(location: Location?) {
-        val lat: Double
-        val lon: Double
+        var lat = 0.0
+        var lon = 0.0
         if (location != null) {
             lat = location.latitude
             lon = location.longitude
-            showToast("lat: ${location.latitude}; lon: ${location.longitude}")
         } else {
-            lat = 44.36; lon = 8.58 // this is random
-            showToast("lat, lon: $lat, $lon")
+            showToast("ERROR LOADING LOCATION")
         }
         val map = ArcGISMap(Basemap.Type.DARK_GRAY_CANVAS_VECTOR, lat, lon, 18)
         mapView.map = map
@@ -144,7 +145,26 @@ class RunningActivity : BaseActivity() {
         setTextView(findViewById(R.id.runningactivity_textview_distance), distance.toString())
     }
 
-    fun startRunning(@Suppress("UNUSED_PARAMETER") v: View) {
+    fun buttonStartStop(@Suppress("UNUSED_PARAMETER") v: View) {
+        currentButtonState = when(currentButtonState) {
+            ButtonState.START -> {
+                val button = findViewById<Button>(R.id.runningactivity_button_start)
+                button.text = resources.getText(R.string.runningactivity_button_stop)
+                button.setBackgroundColor(resources.getColor(R.color.color_red_button_stop))
+                startRunning(v)
+                ButtonState.STOP
+            }
+            ButtonState.STOP -> {
+                stopRunning(v)
+                val button = findViewById<Button>(R.id.runningactivity_button_start)
+                button.text = resources.getText(R.string.runningactivity_button_start)
+                button.setBackgroundColor(resources.getColor(R.color.color_green_button_start))
+                ButtonState.START
+            }
+        }
+    }
+
+    private fun startRunning(@Suppress("UNUSED_PARAMETER") v: View) {
         if(::locationDisplay.isInitialized) {
             if (!locationDisplay.isStarted) {
                 pathService = PathService(System.currentTimeMillis(), this@RunningActivity)
@@ -162,17 +182,7 @@ class RunningActivity : BaseActivity() {
         }
     }
 
-    private fun savePathMade() {
-        if (checkPermissions(REQUEST_PERMISSION_READWRITE_ID)) {
-            if (pathService != null) {
-                if (pathService!!.save(distance.toLong()).not())
-                    showToast("ERROR WHILE WRITING THE FILE")
-            }
-            requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
-        }
-    }
-
-    fun stopRunning(@Suppress("UNUSED_PARAMETER") view: View) {
+    private fun stopRunning(@Suppress("UNUSED_PARAMETER") view: View) {
         if(::locationDisplay.isInitialized)
             if (locationDisplay.isStarted) {
                 shutdownScheduledTask()
@@ -181,24 +191,13 @@ class RunningActivity : BaseActivity() {
             }
     }
 
-    //DEBUG FUNCTION
-    fun checkGetLocation(@Suppress("UNUSED_PARAMETER") view: View) {
-        if (checkPermissions(REQUEST_PERMISSION_LOCATION_ID)) {
-            if (isLocationEnabled()) {
-                fusedLocationClient.lastLocation
-                    .addOnSuccessListener { location: Location? ->
-                        // Got last known location. In some rare situations this can be null.
-                        showToast(
-                            if (location != null) {
-                                "lat: ${location.latitude}; lon: ${location.longitude}"
-                            } else {
-                                "null Received!!"
-                            }
-                        )
-                    }
+    private fun savePathMade() {
+        if (checkPermissions(REQUEST_PERMISSION_READWRITE_ID)) {
+            if (pathService != null) {
+                if (pathService!!.distanceMade != 0L && pathService!!.save(distance.toLong()).not())
+                    showToast("ERROR WHILE WRITING THE FILE")
             }
-        } else {
-            requestPermissions(REQUEST_PERMISSION_LOCATION_ID)
+            requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
         }
     }
 
@@ -237,7 +236,6 @@ class RunningActivity : BaseActivity() {
             } catch (e: NumberFormatException) {
                 false
             }
-
         }
 
         if (fileList != null && fileList.isNotEmpty()) {
@@ -264,7 +262,8 @@ class RunningActivity : BaseActivity() {
     companion object {
         private const val UPDATE_INTERVAL_MS: Long = 1000
         private const val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
-        private const val GCS_WGS84 = 4326 // Geographic coordinate systems return from a GPS device
+        private const val GCS_WGS84 = 4326 // Geographic coordinate systems returned from a GPS device
 
+        private enum class ButtonState {START, STOP}
     }
 }
