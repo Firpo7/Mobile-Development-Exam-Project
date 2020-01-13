@@ -26,14 +26,13 @@ import kotlinx.android.synthetic.main.activity_running.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.locks.ReentrantLock
 
 
 class RunningActivity : BaseActivity() {
 
-    private lateinit var lastLocation: Location
+    private var lastLocation: Location? = null
 
-    @Volatile
-    private var distance = 0.0
     private lateinit var locationDisplay: LocationDisplay
 
     private var locationCallback: LocationCallback? = null
@@ -43,6 +42,7 @@ class RunningActivity : BaseActivity() {
 
     @Volatile
     private var pathService: PathService? = null
+    private val sharedCounterLock = ReentrantLock()
     private var currentButtonState: ButtonState = ButtonState.START
     //private val locationSettingsRequest: LocationSettingsRequest? = null
 
@@ -127,22 +127,31 @@ class RunningActivity : BaseActivity() {
 
     private fun setTextView(textView: TextView, text: String?) {
         if ( text != null )
-            textView.text = distance.toInt().toString()
+            textView.text = text
     }
 
     private fun updateDistance(location: Location?) {
         if (location != null) {
-            pathService?.addPoint(location)
-            if (::lastLocation.isInitialized) {
-                distance += getStepDistance(lastLocation, location)
-                lastLocation = location
-            } else
-                lastLocation = location
+            try {
+                sharedCounterLock.lock()
+                pathService!!.addPoint(location)
+                if (lastLocation != null) {
+                    pathService!!.distanceMade += getStepDistance(lastLocation, location)
+                    lastLocation = location
+                } else
+                    lastLocation = location
+
+                Log.d("RUNNING SCHEDULED TASK", pathService!!.distanceMade.toString())
+                setTextView(
+                    findViewById(R.id.runningactivity_textview_distance),
+                    pathService!!.distanceMade.toLong().toString()
+                )
+            } finally {
+                sharedCounterLock.unlock()
+            }
         } else {
             Log.d("RUNNING SCHEDULED TASK", "null Location!!")
         }
-        Log.d("RUNNING SCHEDULED TASK", distance.toString())
-        setTextView(findViewById(R.id.runningactivity_textview_distance), distance.toString())
     }
 
     fun buttonStartStop(@Suppress("UNUSED_PARAMETER") v: View) {
@@ -150,24 +159,32 @@ class RunningActivity : BaseActivity() {
             ButtonState.START -> {
                 val button = findViewById<Button>(R.id.runningactivity_button_start)
                 button.text = resources.getText(R.string.runningactivity_button_stop)
-                button.setBackgroundColor(resources.getColor(R.color.color_red_button_stop))
-                startRunning(v)
+                button.setBackgroundResource(R.color.color_red_button_stop)
+                startRunning()
                 ButtonState.STOP
             }
             ButtonState.STOP -> {
-                stopRunning(v)
+                stopRunning()
                 val button = findViewById<Button>(R.id.runningactivity_button_start)
                 button.text = resources.getText(R.string.runningactivity_button_start)
-                button.setBackgroundColor(resources.getColor(R.color.color_green_button_start))
+                button.setBackgroundResource(R.color.color_green_button_start)
                 ButtonState.START
             }
         }
     }
 
-    private fun startRunning(@Suppress("UNUSED_PARAMETER") v: View) {
+    private fun startRunning() {
         if(::locationDisplay.isInitialized) {
             if (!locationDisplay.isStarted) {
-                pathService = PathService(System.currentTimeMillis(), this@RunningActivity)
+
+                try {
+                    sharedCounterLock.lock()
+                    pathService = PathService(System.currentTimeMillis(), this@RunningActivity)
+                    lastLocation = null
+                } finally {
+                    sharedCounterLock.unlock()
+                }
+
                 locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
                 locationDisplay.startAsync()
                 fusedLocationClient.requestLocationUpdates(
@@ -182,7 +199,7 @@ class RunningActivity : BaseActivity() {
         }
     }
 
-    private fun stopRunning(@Suppress("UNUSED_PARAMETER") view: View) {
+    private fun stopRunning() {
         if(::locationDisplay.isInitialized)
             if (locationDisplay.isStarted) {
                 shutdownScheduledTask()
@@ -194,7 +211,7 @@ class RunningActivity : BaseActivity() {
     private fun savePathMade() {
         if (checkPermissions(REQUEST_PERMISSION_READWRITE_ID)) {
             if (pathService != null) {
-                if (pathService!!.distanceMade != 0L && pathService!!.save(distance.toLong()).not())
+                if ( pathService!!.distanceMade != 0.0 && pathService!!.save().not() )
                     showToast("ERROR WHILE WRITING THE FILE")
             }
             requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
@@ -215,7 +232,7 @@ class RunningActivity : BaseActivity() {
                 return null
             }
         }
-        ps.distanceMade = jsonObj.getString("distanceMade").toLong()
+        ps.distanceMade = jsonObj.getString("distanceMade").toDouble()
 
         return ps
     }

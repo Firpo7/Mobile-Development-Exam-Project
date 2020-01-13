@@ -10,7 +10,8 @@ import kotlin.collections.ArrayList
 
 
 class PathService(private val timestamp: Long = 0L, ctx: Context) {
-    var distanceMade: Long = 0
+    @Volatile
+    var distanceMade: Double = 0.0
     val latitudes: ArrayList<Double> = ArrayList()
     val longitudes: ArrayList<Double> = ArrayList()
 
@@ -21,10 +22,10 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
         longitudes.add( location.longitude)
     }
 
-    fun save(distance: Long): Boolean {
+    fun save(): Boolean {
         if (timestamp == 0L) return false
 
-        distanceMade = distance
+        //distanceMade = distance
         Log.d("[PathService]", "distanceMade: $distanceMade")
         Log.d("[PathService]", "latitudes: $latitudes")
         Log.d("[PathService]", "longitudes: $longitudes")
@@ -41,7 +42,7 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
                 true
             } catch (e: Exception) {
                 // handle the exception
-                Log.d("Write File Failed", e.message)
+                Log.d("Write File Failed", e.message.toString())
                 false
             }
 

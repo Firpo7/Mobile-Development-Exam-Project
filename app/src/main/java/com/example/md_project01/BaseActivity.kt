@@ -133,8 +133,12 @@ open class BaseActivity : AppCompatActivity() {
             return (earthRadius * c)
         }
 
-        fun getStepDistance(prev: Location, new: Location): Double {
-            return getStepDistance(lat1 = prev.latitude, lat2 = new.latitude, lng1 = prev.longitude, lng2 =  new.longitude)
+        fun getStepDistance(prev: Location?, new: Location): Double {
+            return if (prev != null)
+                getStepDistance(lat1 = prev.latitude, lat2 = new.latitude, lng1 = prev.longitude, lng2 =  new.longitude)
+            else
+                0.0
         }
+
     }
 }
