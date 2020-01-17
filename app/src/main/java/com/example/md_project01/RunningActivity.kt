@@ -167,10 +167,7 @@ class RunningActivity : BaseActivity() {
         mapView.resume()
     }
 
-    private fun setTextView(textView: TextView, text: String?) {
-        if ( text != null )
-            textView.text = text
-    }
+
 
     private fun updateDistance(location: Location?) {
         if (location != null) {

@@ -7,6 +7,7 @@ import android.content.res.Resources
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -97,6 +98,11 @@ open class BaseActivity : AppCompatActivity() {
             } while ({ m = m?.next(); m }() != null)
         }
         return ret
+    }
+
+    protected fun setTextView(textView: TextView, text: String?) {
+        if ( text != null )
+            textView.text = text
     }
 
     fun showToast(msg: String?) {
