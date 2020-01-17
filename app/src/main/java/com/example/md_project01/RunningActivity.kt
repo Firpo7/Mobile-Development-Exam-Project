@@ -5,10 +5,12 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import com.esri.arcgisruntime.geometry.Point
 import com.esri.arcgisruntime.geometry.PointCollection
 import com.esri.arcgisruntime.geometry.Polyline
@@ -24,7 +26,7 @@ import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import kotlinx.android.synthetic.main.activity_running.*
+import kotlinx.android.synthetic.main.content_running.*
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -53,6 +55,10 @@ class RunningActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_running)
+
+        val toolbar: Toolbar  = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         
         getLocationWithCallback { location: Location? ->
             initializeMap(location)
@@ -86,6 +92,21 @@ class RunningActivity : BaseActivity() {
         shutdownScheduledTask()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == R.id.action_show_path_histories) {
+            showPathHistories()
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun shutdownScheduledTask() {
         fusedLocationClient.removeLocationUpdates(this.locationCallback)
     }
@@ -113,7 +134,7 @@ class RunningActivity : BaseActivity() {
         val points = PointCollection(SpatialReference.create(GCS_WGS84))
         var meanLongitudes = 0.0
         var meanLatitudes = 0.0
-        val numCoordinates = ps.latitudes.size;
+        val numCoordinates = ps.latitudes.size
 
         for (i in 0 until numCoordinates) {
             points.add(ps.longitudes[i], ps.latitudes[i])
@@ -136,8 +157,8 @@ class RunningActivity : BaseActivity() {
             ps.latitudes[numCoordinates - 1],
             SpatialReference.create(GCS_WGS84)
         )
-        val greenCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 0, 255, 0), 10f);
-        val redCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 255, 0, 0), 10f);
+        val greenCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 0, 255, 0), 10f)
+        val redCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 255, 0, 0), 10f)
 
         val lineGraphic = Graphic(pathLine, lineSymbol)
         val startPointGraphic = Graphic(startPoint, greenCircleSymbol)
@@ -276,7 +297,7 @@ class RunningActivity : BaseActivity() {
         return ps
     }
 
-    fun showPathHistories(@Suppress("UNUSED_PARAMETER") v: View) {
+    fun showPathHistories() {
         val builder = AlertDialog.Builder(this@RunningActivity)
         builder.setTitle("Choose a path")
 
@@ -313,6 +334,10 @@ class RunningActivity : BaseActivity() {
         } else {
             showToast("No previous paths to show")
         }
+    }
+
+    fun showPathHistories(@Suppress("UNUSED_PARAMETER") v: View) {
+        showPathHistories()
     }
 
     companion object {
