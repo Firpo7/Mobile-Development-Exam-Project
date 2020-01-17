@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import com.esri.arcgisruntime.geometry.Point
 import com.esri.arcgisruntime.geometry.PointCollection
 import com.esri.arcgisruntime.geometry.Polyline
 import com.esri.arcgisruntime.geometry.SpatialReference
@@ -19,6 +20,7 @@ import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
 import com.esri.arcgisruntime.mapping.view.LocationDisplay
 import com.esri.arcgisruntime.mapping.view.WrapAroundMode
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol
+import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -38,7 +40,9 @@ class RunningActivity : BaseActivity() {
     private var locationCallback: LocationCallback? = null
     private lateinit var locationRequest: LocationRequest
     private lateinit var graphicsOverlay: GraphicsOverlay
-    private var lastGraphic: Graphic? = null
+    private var lastLineGraphic: Graphic? = null
+    private var lastStartPointGraphic: Graphic? = null
+    private var lastEndPointGraphic: Graphic? = null
 
     @Volatile
     private var pathService: PathService? = null
@@ -107,22 +111,60 @@ class RunningActivity : BaseActivity() {
 
     private fun addPathLayer(ps: PathService) {
         val points = PointCollection(SpatialReference.create(GCS_WGS84))
+        var meanLongitudes = 0.0
+        var meanLatitudes = 0.0
+        val numCoordinates = ps.latitudes.size;
 
-        for (i in ps.latitudes.indices) {
+        for (i in 0 until numCoordinates) {
             points.add(ps.longitudes[i], ps.latitudes[i])
+            meanLongitudes += ps.longitudes[i]
+            meanLatitudes += ps.latitudes[i]
         }
 
-        val polyline = Polyline(points)
+        meanLongitudes /= ps.longitudes.size
+        meanLatitudes /= ps.latitudes.size
+
+        val pathLine = Polyline(points)
         val lineSymbol = SimpleLineSymbol(
             SimpleLineSymbol.Style.SOLID,
             Color.argb(255, 255, 255, 255), 5.0f
         )
+        val startPoint =
+            Point(ps.longitudes[0], ps.latitudes[0], SpatialReference.create(GCS_WGS84))
+        val endPoint = Point(
+            ps.longitudes[numCoordinates - 1],
+            ps.latitudes[numCoordinates - 1],
+            SpatialReference.create(GCS_WGS84)
+        )
+        val greenCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 0, 255, 0), 10f);
+        val redCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 255, 0, 0), 10f);
 
-        val graphic = Graphic(polyline, lineSymbol)
+        val lineGraphic = Graphic(pathLine, lineSymbol)
+        val startPointGraphic = Graphic(startPoint, greenCircleSymbol)
+        val endPointGraphic = Graphic(endPoint, redCircleSymbol)
 
-        graphicsOverlay.graphics.remove(lastGraphic)
-        graphicsOverlay.graphics.add(graphic)
-        lastGraphic = graphic
+        graphicsOverlay.graphics.removeAll(
+            listOf(
+                lastLineGraphic,
+                lastStartPointGraphic,
+                lastEndPointGraphic
+            )
+        )
+        graphicsOverlay.graphics.addAll(
+            listOf(
+                lineGraphic,
+                startPointGraphic,
+                endPointGraphic
+            )
+        )
+
+        lastLineGraphic = lineGraphic
+        lastStartPointGraphic = startPointGraphic
+        lastEndPointGraphic = endPointGraphic
+
+        val centerPoint = Point(meanLongitudes, meanLatitudes, SpatialReference.create(GCS_WGS84))
+        mapView.setViewpointCenterAsync(centerPoint, 2500.0)
+        mapView.resume()
     }
 
     private fun setTextView(textView: TextView, text: String?) {
