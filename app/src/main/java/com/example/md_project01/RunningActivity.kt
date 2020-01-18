@@ -282,17 +282,24 @@ class RunningActivity : BaseActivity() {
         val ps = PathService(ctx = this@RunningActivity)
 
         val jsonObj = JSONObject(json.substring(json.indexOf("{"), json.lastIndexOf("}") + 1))
+
+        try {
+            ps.distanceMade = jsonObj.getString("distanceMade").toDouble()
+        } catch (e: Exception) {
+            return null
+        }
+
         val latJson = jsonObj.getJSONArray("latitudes")
         val lonJson = jsonObj.getJSONArray("longitudes")
+
         for (i in 0 until latJson.length()) {
             try {
                 ps.latitudes.add(latJson[i].toString().toDouble())
                 ps.longitudes.add(lonJson[i].toString().toDouble())
-            } catch (e: java.lang.Exception) {
+            } catch (e: Exception) {
                 return null
             }
         }
-        ps.distanceMade = jsonObj.getString("distanceMade").toDouble()
 
         return ps
     }
