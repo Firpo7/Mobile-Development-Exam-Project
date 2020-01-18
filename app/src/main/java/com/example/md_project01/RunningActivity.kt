@@ -28,6 +28,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import kotlinx.android.synthetic.main.content_running.*
 import org.json.JSONObject
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -101,6 +102,11 @@ class RunningActivity : BaseActivity() {
         val id = item.itemId
         if (id == R.id.action_show_path_histories) {
             showPathHistories()
+            return true
+        }
+
+        if (id == R.id.action_delete_some_paths) {
+            deleteSavedPath()
             return true
         }
 
@@ -304,9 +310,46 @@ class RunningActivity : BaseActivity() {
         return ps
     }
 
+    private fun deleteSavedPath() {
+        val filesToDelete = mutableSetOf<File>()
+        val builder = AlertDialog.Builder(this@RunningActivity)
+        builder.setTitle("Choose some animals")
+
+        val fileList = PathService.getPastPathFilesList(this@RunningActivity)
+
+        if (fileList != null && fileList.isNotEmpty()) {
+            val fileNames = Array(fileList.size) { i ->
+                val timestamp = fileList[i].name.split(".")[0].toLong()
+                val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
+                sdf.format(Date(timestamp))
+            }
+
+            builder.setMultiChoiceItems(fileNames, BooleanArray(fileList.size) { false } ) { _, which, isChecked ->
+                if (isChecked) {
+                    filesToDelete.add(fileList[which])
+                } else {
+                    filesToDelete.remove(fileList[which])
+                }
+            }
+
+            builder.setPositiveButton("Delete") { _, _ ->
+                // user clicked OK
+                for ( f in filesToDelete) {
+                    f.delete()
+                }
+            }
+
+            builder.setNegativeButton("Cancel", null)
+
+            val dialog = builder.create()
+            dialog.show()
+        }
+
+    }
+
     private fun showPathHistories() {
         val builder = AlertDialog.Builder(this@RunningActivity)
-        builder.setTitle("Choose a path")
+        builder.setTitle("Choose a path to load")
 
         val fileList = PathService.getPastPathFilesList(this@RunningActivity)
 

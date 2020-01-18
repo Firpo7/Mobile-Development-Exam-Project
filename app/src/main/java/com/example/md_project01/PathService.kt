@@ -61,7 +61,7 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
             val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
             if (checkDir(dir)) {
                 val dest = File(dir)
-                return dest.listFiles().filter { f ->
+                return dest.listFiles()?.filter { f ->
                     try {
                         f.name.split(".")[0].toLong()
 
