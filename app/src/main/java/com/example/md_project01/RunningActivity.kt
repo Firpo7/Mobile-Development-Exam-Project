@@ -297,23 +297,11 @@ class RunningActivity : BaseActivity() {
         return ps
     }
 
-    fun showPathHistories() {
+    private fun showPathHistories() {
         val builder = AlertDialog.Builder(this@RunningActivity)
         builder.setTitle("Choose a path")
 
-        val fileList = PathService.getPastPathFilesList(this@RunningActivity)?.filter { f ->
-            try {
-                f.name.split(".")[0].toLong()
-
-                /*
-                 * TODO: check that files contain a valid JSON (?)
-                 */
-
-                true
-            } catch (e: NumberFormatException) {
-                false
-            }
-        }
+        val fileList = PathService.getPastPathFilesList(this@RunningActivity)
 
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->
@@ -334,10 +322,6 @@ class RunningActivity : BaseActivity() {
         } else {
             showToast("No previous paths to show")
         }
-    }
-
-    fun showPathHistories(@Suppress("UNUSED_PARAMETER") v: View) {
-        showPathHistories()
     }
 
     companion object {
