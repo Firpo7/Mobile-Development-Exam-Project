@@ -1,7 +1,10 @@
 package com.example.md_project01
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.location.Location
@@ -10,7 +13,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import java.util.concurrent.Callable
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -20,10 +25,23 @@ import kotlin.math.sqrt
 open class BaseActivity : AppCompatActivity() {
 
     lateinit var fusedLocationClient: FusedLocationProviderClient
+    lateinit var broadcastRec: BroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(::broadcastRec.isInitialized)
+            registerReceiver(broadcastRec, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if(::broadcastRec.isInitialized)
+            unregisterReceiver(broadcastRec)
     }
 
     protected fun checkPermissions(permission: Int): Boolean {
@@ -38,8 +56,8 @@ open class BaseActivity : AppCompatActivity() {
 
     protected fun requestPermissions(code: Int) {
         val permissions = when(code) {
-            REQUEST_PERMISSION_READWRITE_ID -> arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-            REQUEST_PERMISSION_LOCATION_ID -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            REQUEST_PERMISSION_LOCATION_ID -> arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+            REQUEST_PERMISSION_READWRITE_ID -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
             else -> arrayOf()
         }
 
@@ -52,6 +70,7 @@ open class BaseActivity : AppCompatActivity() {
             code
         )
     }
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode ==
@@ -84,6 +103,15 @@ open class BaseActivity : AppCompatActivity() {
             }
         } else {
             requestPermissions(REQUEST_PERMISSION_LOCATION_ID)
+        }
+    }
+
+    protected fun addLocationListener(callback: () -> Unit){
+        broadcastRec = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action!!.matches("android.location.PROVIDERS_CHANGED".toRegex()))
+                    callback()
+            }
         }
     }
 
@@ -141,4 +169,7 @@ open class BaseActivity : AppCompatActivity() {
         }
 
     }
+
 }
+
+

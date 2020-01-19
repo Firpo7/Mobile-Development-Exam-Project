@@ -25,7 +25,7 @@
                 android:id="@+id/weekday_0"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textAlignment="center" />
 
             <ImageView
@@ -44,7 +44,7 @@
                 android:id="@+id/weekday_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textAlignment="center"/>
 
             <ImageView
@@ -63,7 +63,7 @@
                 android:id="@+id/weekday_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textAlignment="center"/>
 
             <ImageView
@@ -82,7 +82,7 @@
                 android:id="@+id/weekday_3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textAlignment="center"/>
 
             <ImageView
@@ -101,7 +101,7 @@
                 android:id="@+id/weekday_4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textAlignment="center"/>
 
             <ImageView
@@ -121,7 +121,7 @@
                 android:id="@+id/weekday_5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textAlignment="center"/>
 
             <ImageView
@@ -140,7 +140,7 @@
                 android:id="@+id/weekday_6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text=""
                 android:textAlignment="center" />
 
             <ImageView
@@ -162,5 +162,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/reload_forecast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="grant permission to see forecast"
+        android:visibility="gone"
+        android:onClick="updateForecast"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.146" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,48 +3,52 @@ package com.example.md_project01
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.location.GpsStatus
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import java.util.Calendar
+import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
+
 
 class MainActivity : BaseActivity() {
 
     val DAY_LAYOUTS: IntArray = intArrayOf(R.id.day0,R.id.day1,R.id.day2,R.id.day3,R.id.day4,R.id.day5,R.id.day6)
+    private var isForecastInit = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-
-        val width = displayMetrics.widthPixels
-        //val height = displayMetrics.heightPixels
-
-        val frameWidth = width / DAY_LAYOUTS.size
-
-        val currDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1
-
-        for ( i in DAY_LAYOUTS.indices) {
-            val currFrame = findViewById<FrameLayout>(DAY_LAYOUTS[i])
-
-            currFrame.layoutParams.width = frameWidth
-            currFrame.layoutParams.height = frameWidth + 25.px
-
-            (currFrame.getChildAt(0) as TextView).text = getDayName( ( (currDayOfWeek + i) % 7 ) + 1 )
+        addLocationListener {
+            if(isLocationEnabled()){
+                showToast("Location enabled")
+                updateForecast()
+            }
+            else{
+                //TODO: notify better
+                showToast("Location disabled")
+            }
         }
-
         updateForecast()
+    }
 
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        if (requestCode == REQUEST_PERMISSION_LOCATION_ID) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                updateForecast()
+            }
+        }
     }
 
     private fun getDayName(i: Int): String {
@@ -136,18 +140,58 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun updateForecast(){
-        getLocationWithCallback { location: Location? ->
-            doForecast(location)
+    private fun initForecast(){
+        val b: Button = findViewById(R.id.reload_forecast)
+
+        if(checkPermissions(REQUEST_PERMISSION_LOCATION_ID)){
+            b.visibility = View.GONE
+            val displayMetrics = DisplayMetrics()
+            windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+            val width = displayMetrics.widthPixels
+            //val height = displayMetrics.heightPixels
+
+            val frameWidth = width / DAY_LAYOUTS.size
+
+            val currDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1
+
+            for (i in DAY_LAYOUTS.indices) {
+                val currFrame = findViewById<FrameLayout>(DAY_LAYOUTS[i])
+
+                currFrame.layoutParams.width = frameWidth
+                currFrame.layoutParams.height = frameWidth + 25.px
+
+                (currFrame.getChildAt(0) as TextView).text = getDayName( ( (currDayOfWeek + i) % 7 ) + 1 )
+            }
+            isForecastInit = true
+        }
+        else{
+            b.visibility = View.VISIBLE
+            requestPermissions(REQUEST_PERMISSION_LOCATION_ID)
+        }
+    }
+
+    fun updateForecast(v: View? = null){
+        if(!isForecastInit)
+            initForecast()
+        if(isForecastInit) { //no one ELSE here, please
+            getLocationWithCallback { location: Location? ->
+                doForecast(location)
+            }
         }
     }
 
     fun startRunPressed(@Suppress("UNUSED_PARAMETER") view: View) {
-        val runningIntent = Intent(
-            this,
-            RunningActivity::class.java)
-
-        startActivity(runningIntent)
+        if (!checkPermissions(REQUEST_PERMISSION_LOCATION_ID)){
+            requestPermissions(REQUEST_PERMISSION_LOCATION_ID)
+        }
+        else if (!checkPermissions(REQUEST_PERMISSION_READWRITE_ID)){
+            requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
+        }
+        else{
+            val runningIntent = Intent(this, RunningActivity::class.java)
+            startActivity(runningIntent)
+        }
     }
 
 }
