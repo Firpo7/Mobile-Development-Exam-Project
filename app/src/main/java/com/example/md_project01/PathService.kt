@@ -57,11 +57,23 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
     }
 
     companion object {
-        fun getPastPathFilesList(ctx: Context): Array<File>? {
+        fun getPastPathFilesList(ctx: Context): List<File>? {
             val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
             if (checkDir(dir)) {
                 val dest = File(dir)
-                return dest.listFiles()
+                return dest.listFiles()?.filter { f ->
+                    try {
+                        f.name.split(".")[0].toLong()
+
+                        /*
+                         * TODO: check that files contain a valid JSON (?)
+                         */
+
+                        true
+                    } catch (e: NumberFormatException) {
+                        false
+                    }
+                }
             }
 
             return null

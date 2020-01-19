@@ -5,10 +5,13 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
+import com.esri.arcgisruntime.geometry.Point
 import com.esri.arcgisruntime.geometry.PointCollection
 import com.esri.arcgisruntime.geometry.Polyline
 import com.esri.arcgisruntime.geometry.SpatialReference
@@ -19,11 +22,13 @@ import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
 import com.esri.arcgisruntime.mapping.view.LocationDisplay
 import com.esri.arcgisruntime.mapping.view.WrapAroundMode
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol
+import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import kotlinx.android.synthetic.main.activity_running.*
+import kotlinx.android.synthetic.main.content_running.*
 import org.json.JSONObject
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
@@ -38,7 +43,9 @@ class RunningActivity : BaseActivity() {
     private var locationCallback: LocationCallback? = null
     private lateinit var locationRequest: LocationRequest
     private lateinit var graphicsOverlay: GraphicsOverlay
-    private var lastGraphic: Graphic? = null
+    private var lastLineGraphic: Graphic? = null
+    private var lastStartPointGraphic: Graphic? = null
+    private var lastEndPointGraphic: Graphic? = null
 
     @Volatile
     private var pathService: PathService? = null
@@ -49,6 +56,10 @@ class RunningActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_running)
+
+        val toolbar: Toolbar  = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         
         getLocationWithCallback { location: Location? ->
             initializeMap(location)
@@ -82,6 +93,26 @@ class RunningActivity : BaseActivity() {
         shutdownScheduledTask()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == R.id.action_show_path_histories) {
+            showPathHistories()
+            return true
+        }
+
+        if (id == R.id.action_delete_some_paths) {
+            deleteSavedPath()
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun shutdownScheduledTask() {
         fusedLocationClient.removeLocationUpdates(this.locationCallback)
     }
@@ -107,28 +138,63 @@ class RunningActivity : BaseActivity() {
 
     private fun addPathLayer(ps: PathService) {
         val points = PointCollection(SpatialReference.create(GCS_WGS84))
+        var meanLongitudes = 0.0
+        var meanLatitudes = 0.0
+        val numCoordinates = ps.latitudes.size
 
-        for (i in ps.latitudes.indices) {
+        for (i in 0 until numCoordinates) {
             points.add(ps.longitudes[i], ps.latitudes[i])
+            meanLongitudes += ps.longitudes[i]
+            meanLatitudes += ps.latitudes[i]
         }
 
-        val polyline = Polyline(points)
+        meanLongitudes /= ps.longitudes.size
+        meanLatitudes /= ps.latitudes.size
+
+        val pathLine = Polyline(points)
         val lineSymbol = SimpleLineSymbol(
             SimpleLineSymbol.Style.SOLID,
             Color.argb(255, 255, 255, 255), 5.0f
         )
+        val startPoint =
+            Point(ps.longitudes[0], ps.latitudes[0], SpatialReference.create(GCS_WGS84))
+        val endPoint = Point(
+            ps.longitudes[numCoordinates - 1],
+            ps.latitudes[numCoordinates - 1],
+            SpatialReference.create(GCS_WGS84)
+        )
+        val greenCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 0, 255, 0), 10f)
+        val redCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 255, 0, 0), 10f)
 
-        val graphic = Graphic(polyline, lineSymbol)
+        val lineGraphic = Graphic(pathLine, lineSymbol)
+        val startPointGraphic = Graphic(startPoint, greenCircleSymbol)
+        val endPointGraphic = Graphic(endPoint, redCircleSymbol)
 
-        graphicsOverlay.graphics.remove(lastGraphic)
-        graphicsOverlay.graphics.add(graphic)
-        lastGraphic = graphic
+        graphicsOverlay.graphics.removeAll(
+            listOf(
+                lastLineGraphic,
+                lastStartPointGraphic,
+                lastEndPointGraphic
+            )
+        )
+        graphicsOverlay.graphics.addAll(
+            listOf(
+                lineGraphic,
+                startPointGraphic,
+                endPointGraphic
+            )
+        )
+
+        lastLineGraphic = lineGraphic
+        lastStartPointGraphic = startPointGraphic
+        lastEndPointGraphic = endPointGraphic
+
+        val centerPoint = Point(meanLongitudes, meanLatitudes, SpatialReference.create(GCS_WGS84))
+        mapView.setViewpointCenterAsync(centerPoint, 2500.0)
+        mapView.resume()
     }
 
-    private fun setTextView(textView: TextView, text: String?) {
-        if ( text != null )
-            textView.text = text
-    }
+
 
     private fun updateDistance(location: Location?) {
         if (location != null) {
@@ -222,38 +288,70 @@ class RunningActivity : BaseActivity() {
         val ps = PathService(ctx = this@RunningActivity)
 
         val jsonObj = JSONObject(json.substring(json.indexOf("{"), json.lastIndexOf("}") + 1))
+
+        try {
+            ps.distanceMade = jsonObj.getString("distanceMade").toDouble()
+        } catch (e: Exception) {
+            return null
+        }
+
         val latJson = jsonObj.getJSONArray("latitudes")
         val lonJson = jsonObj.getJSONArray("longitudes")
+
         for (i in 0 until latJson.length()) {
             try {
                 ps.latitudes.add(latJson[i].toString().toDouble())
                 ps.longitudes.add(lonJson[i].toString().toDouble())
-            } catch (e: java.lang.Exception) {
+            } catch (e: Exception) {
                 return null
             }
         }
-        ps.distanceMade = jsonObj.getString("distanceMade").toDouble()
 
         return ps
     }
 
-    fun showPathHistories(@Suppress("UNUSED_PARAMETER") v: View) {
+    private fun deleteSavedPath() {
+        val filesToDelete = mutableSetOf<File>()
         val builder = AlertDialog.Builder(this@RunningActivity)
-        builder.setTitle("Choose a path")
+        builder.setTitle("Choose some animals")
 
-        val fileList = PathService.getPastPathFilesList(this@RunningActivity)?.filter { f ->
-            try {
-                f.name.split(".")[0].toLong()
+        val fileList = PathService.getPastPathFilesList(this@RunningActivity)
 
-                /*
-                 * TODO: check that files contain a valid JSON (?)
-                 */
-
-                true
-            } catch (e: NumberFormatException) {
-                false
+        if (fileList != null && fileList.isNotEmpty()) {
+            val fileNames = Array(fileList.size) { i ->
+                val timestamp = fileList[i].name.split(".")[0].toLong()
+                val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
+                sdf.format(Date(timestamp))
             }
+
+            builder.setMultiChoiceItems(fileNames, BooleanArray(fileList.size) { false } ) { _, which, isChecked ->
+                if (isChecked) {
+                    filesToDelete.add(fileList[which])
+                } else {
+                    filesToDelete.remove(fileList[which])
+                }
+            }
+
+            builder.setPositiveButton("Delete") { _, _ ->
+                // user clicked OK
+                for ( f in filesToDelete) {
+                    f.delete()
+                }
+            }
+
+            builder.setNegativeButton("Cancel", null)
+
+            val dialog = builder.create()
+            dialog.show()
         }
+
+    }
+
+    private fun showPathHistories() {
+        val builder = AlertDialog.Builder(this@RunningActivity)
+        builder.setTitle("Choose a path to load")
+
+        val fileList = PathService.getPastPathFilesList(this@RunningActivity)
 
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->

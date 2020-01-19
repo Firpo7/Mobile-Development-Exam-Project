@@ -5,4 +5,9 @@
     <string name="runningactivity_button_start">START</string>
     <string name="runningactivity_button_stop">STOP</string>
 
+    <string name="mainactivity_button_start_running">START RUNNING!!</string>
+
+    <string name="mainactivity_textview_run_suggestion_good">TODAY IS A GOOD DAY!!</string>
+    <string name="mainactivity_textview_run_suggestion_bad">MAYBE NOT TODAY..</string>
+
 </resources>
