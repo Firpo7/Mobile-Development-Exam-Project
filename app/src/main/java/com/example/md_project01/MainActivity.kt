@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import android.location.GpsStatus
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -32,6 +31,7 @@ class MainActivity : BaseActivity() {
         addLocationListener {
             if(isLocationEnabled()){
                 showToast("Location enabled")
+
                 updateForecast()
             }
             else{
@@ -150,6 +150,9 @@ class MainActivity : BaseActivity() {
             e.putString(PREF_LATITUDE, location.latitude.toString())
             e.putString(PREF_LONGITUDE, location.longitude.toString())
             e.apply()
+        }
+        else{
+            Log.d("[MainActivity]","location = null")
         }
     }
 

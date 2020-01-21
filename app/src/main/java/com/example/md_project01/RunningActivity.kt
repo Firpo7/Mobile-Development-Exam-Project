@@ -212,6 +212,7 @@ class RunningActivity : BaseActivity() {
                     findViewById(R.id.runningactivity_textview_distance),
                     pathService!!.distanceMade.toLong().toString()
                 )
+                Log.d("setTextView", "OK")
             } finally {
                 sharedCounterLock.unlock()
             }
@@ -278,6 +279,17 @@ class RunningActivity : BaseActivity() {
         if (checkPermissions(REQUEST_PERMISSION_READWRITE_ID)) {
             if (pathService != null) {
                 if ( pathService!!.distanceMade != 0.0 && pathService!!.save().not() )
+                    showToast("ERROR WHILE WRITING THE FILE")
+            }
+            requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
+        }
+        d_savePathMade()
+    }
+
+    private fun d_savePathMade() {
+        if (checkPermissions(REQUEST_PERMISSION_READWRITE_ID)) {
+            if (pathService != null) {
+                if ( pathService!!.distanceMade != 0.0 && pathService!!.d_save().not() )
                     showToast("ERROR WHILE WRITING THE FILE")
             }
             requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
@@ -355,9 +367,10 @@ class RunningActivity : BaseActivity() {
 
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->
-                val timestamp = fileList[i].name.split(".")[0].toLong()
-                val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
-                sdf.format(Date(timestamp))
+                //val timestamp = fileList[i].name.split(".")[0].toLong()
+                //val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
+                //sdf.format(Date(timestamp))
+                fileList[i].name
             }
 
             builder.setItems(fileNames) { _, which ->
