@@ -98,6 +98,7 @@ class MainActivity : BaseActivity() {
                 else -> resources.getString(R.string.mainactivity_textview_run_suggestion_bad)
             }
         )
+        textView.visibility = View.VISIBLE
     }
 
     private fun doForecast(location: Location?) {
