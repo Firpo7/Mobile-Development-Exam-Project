@@ -31,7 +31,6 @@ class MainActivity : BaseActivity() {
         addLocationListener {
             if(isLocationEnabled()){
                 showToast("Location enabled")
-
                 updateForecast()
             }
             else{
@@ -187,7 +186,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun updateForecast(v: View? = null){
+    fun updateForecast(@Suppress("UNUSED_PARAMETER") v: View? = null){
         if(!isForecastInit)
             initForecast()
         if(isForecastInit) { //no one ELSE here, please

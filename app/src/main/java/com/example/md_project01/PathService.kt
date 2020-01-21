@@ -35,7 +35,8 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
     }
 
     fun save(): Boolean {
-        if (timestamp == 0L) return false
+        if (timestamp == 0L || latitudes.isEmpty() || longitudes.isEmpty()) return false
+        //save() and addPoint() are thread safe?
 
         //distanceMade = distance
      /*   Log.d("[PathService]", "distanceMade: $distanceMade")
