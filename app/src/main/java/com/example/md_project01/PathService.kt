@@ -19,11 +19,7 @@ fun getStepDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Dou
     val earthRadius = 6371000.0 //meters
     val dLat = Math.toRadians((lat2 - lat1))
     val dLng = Math.toRadians((lng2 - lng1))
-    val a =
-        sin(dLat / 2) * sin(dLat / 2) + cos(Math.toRadians(lat1)) * cos(
-            Math.toRadians(lat2)
-        ) *
-                sin(dLng / 2) * sin(dLng / 2)
+    val a = sin(dLat/2) * sin(dLat/2) + cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(dLng/2) * sin(dLng/2)
     val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
     return (earthRadius * c)
@@ -51,7 +47,9 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
     private val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
 
     fun addPoint(location: Location): Double? {
-        //Log.d("## addPoint ##", "lat=${location.latitude}, lon=${location.longitude}")
+        Log.d("## addPoint ##", "lat=${location.latitude}, lon=${location.longitude}")
+        d_latitudes.add(location.latitude)
+        d_longitudes.add(location.longitude)
         val midp = buffer.add(Point(location.latitude, location.longitude))
         if(midp != null){
             latitudes.add(midp.lat)
@@ -64,10 +62,8 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
                 lastLocation = location
 
             return distanceMade
-            //Log.d("## addPoint ##", "!+ lat=${midp.lat}, lon=${midp.lon}")
+            Log.d("## addPoint ##", "!+ lat=${midp.lat}, lon=${midp.lon}")
         }
-        d_latitudes.add(location.latitude)
-        d_longitudes.add(location.longitude)
         return null
     }
 
