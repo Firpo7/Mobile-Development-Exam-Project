@@ -200,18 +200,14 @@ class RunningActivity : BaseActivity() {
         if (location != null) {
             try {
                 sharedCounterLock.lock()
-                pathService!!.addPoint(location)
-                if (lastLocation != null) {
-                    pathService!!.distanceMade += getStepDistance(lastLocation, location)
-                    lastLocation = location
-                } else
-                    lastLocation = location
+                val distanceUpdated = pathService!!.addPoint(location)
 
                 Log.d("RUNNING SCHEDULED TASK", pathService!!.distanceMade.toString())
-                setTextView(
-                    findViewById(R.id.runningactivity_textview_distance),
-                    pathService!!.distanceMade.toLong().toString()
-                )
+                if(distanceUpdated != null)
+                    setTextView(
+                        findViewById(R.id.runningactivity_textview_distance),
+                        distanceUpdated.toLong().toString()
+                    )
                 Log.d("setTextView", "OK")
             } finally {
                 sharedCounterLock.unlock()
