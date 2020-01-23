@@ -55,14 +55,13 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
             latitudes.add(midp.lat)
             longitudes.add(midp.lon)
 
-            if (lastLocation != null) {
+            if (lastLocation != null)
                 distanceMade += getStepDistance(lastLocation, location)
-                lastLocation = location
-            } else
-                lastLocation = location
 
-            return distanceMade
+            lastLocation = location
+
             Log.d("## addPoint ##", "!+ lat=${midp.lat}, lon=${midp.lon}")
+            return distanceMade
         }
         return null
     }
@@ -184,6 +183,7 @@ class PositionBuffer(private val bufSize: Int, private val flushDim: Int){
 
     fun midPoint(): Point {
         val p = Point(0.0,0.0)
+
         for(x in buffer){
             p.lat += x.lat
             p.lon += x.lon
