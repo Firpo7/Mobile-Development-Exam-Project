@@ -9,7 +9,7 @@ import java.io.PrintWriter
 import kotlin.collections.ArrayList
 
 
-class PathService(private val timestamp: Long = 0L, ctx: Context) {
+class PathService(val timestamp: Long = 0L, ctx: Context) {
     @Volatile
     var distanceMade: Double = 0.0
     val latitudes: ArrayList<Double> = ArrayList()

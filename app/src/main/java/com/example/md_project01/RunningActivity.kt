@@ -270,6 +270,7 @@ class RunningActivity : BaseActivity() {
             if (locationDisplay.isStarted) {
                 shutdownScheduledTask()
                 savePathMade()
+                saveStats()
                 locationDisplay.stop()
             }
     }
@@ -282,6 +283,10 @@ class RunningActivity : BaseActivity() {
             }
             requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
         }
+    }
+
+    private fun saveStats() {
+        MyInsertTask(this@RunningActivity, Stats(Date(pathService!!.timestamp), pathService!!.distanceMade.toLong())).execute()
     }
 
     private fun loadPathFromJSON(json: String): PathService? {

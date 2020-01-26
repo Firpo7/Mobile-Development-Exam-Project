@@ -179,4 +179,44 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
+    <TextView
+        android:id="@+id/mainactivity_db_values"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/startRunning"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mainactivity_textview_run_suggestion"
+        app:layout_constraintVertical_bias="0.936" />
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/mainactivity_barchart_statistics"
+        android:layout_width="0dp"
+        android:layout_height="230dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/startRunning"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mainactivity_textview_run_suggestion" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="insertShitInDB"
+        android:text="add test"
+        app:layout_constraintBottom_toTopOf="@+id/startRunning"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="retrieveShitFromDB"
+        android:text="query test"
+        app:layout_constraintBottom_toTopOf="@+id/startRunning"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
