@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TextView"
-                android:textAlignment="center"/>
+                android:textAlignment="center" />
 
             <ImageView
                 android:id="@+id/forecastday_1"
@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TextView"
-                android:textAlignment="center"/>
+                android:textAlignment="center" />
 
             <ImageView
                 android:id="@+id/forecastday_2"
@@ -83,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TextView"
-                android:textAlignment="center"/>
+                android:textAlignment="center" />
 
             <ImageView
                 android:id="@+id/forecastday_3"
@@ -102,7 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TextView"
-                android:textAlignment="center"/>
+                android:textAlignment="center" />
 
             <ImageView
                 android:id="@+id/forecastday_4"
@@ -122,7 +122,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TextView"
-                android:textAlignment="center"/>
+                android:textAlignment="center" />
 
             <ImageView
                 android:id="@+id/forecastday_5"
@@ -179,17 +179,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-    <TextView
-        android:id="@+id/mainactivity_db_values"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/startRunning"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainactivity_textview_run_suggestion"
-        app:layout_constraintVertical_bias="0.936" />
-
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/mainactivity_barchart_statistics"
         android:layout_width="0dp"
@@ -198,25 +187,66 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toTopOf="@+id/startRunning"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainactivity_textview_run_suggestion" />
+        app:layout_constraintTop_toBottomOf="@+id/mainactivity_textview_run_suggestion"
+        app:layout_constraintVertical_bias="0.383" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="insertShitInDB"
+        android:onClick="insertRandomValuesInDB"
         android:text="add test"
         app:layout_constraintBottom_toTopOf="@+id/startRunning"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/button3"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="retrieveShitFromDB"
-        android:text="query test"
-        app:layout_constraintBottom_toTopOf="@+id/startRunning"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_marginEnd="32dp"
+        android:onClick="set7Days"
+        android:text="last week"
+        android:textColor="@android:color/holo_green_dark"
+        app:layout_constraintBaseline_toBaselineOf="@+id/button4"
+        app:layout_constraintEnd_toStartOf="@+id/button4" />
+
+    <Button
+        android:id="@+id/button4"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:onClick="set30Days"
+        android:text="last month"
+        android:textColor="@android:color/holo_green_dark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mainactivity_barchart_statistics" />
+
+    <Button
+        android:id="@+id/button5"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:onClick="set365Days"
+        android:text="last year"
+        android:textColor="@android:color/holo_green_dark"
+        app:layout_constraintBaseline_toBaselineOf="@+id/button4"
+        app:layout_constraintStart_toEndOf="@+id/button4" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/mainactivity_textview_your_stats"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/mainactivity_barchart_statistics"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

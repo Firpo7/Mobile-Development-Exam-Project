@@ -23,13 +23,15 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
+import kotlin.random.Random
 
 
 class MainActivity : BaseActivity() {
 
     private val DAY_LAYOUTS: IntArray = intArrayOf(R.id.day0,R.id.day1,R.id.day2,R.id.day3,R.id.day4,R.id.day5,R.id.day6)
     private lateinit var mChart: BarChart
-    private var DAYS_TO_SHOW: Long = 30
+    private var DAYS_TO_SHOW: Long = 7
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +42,7 @@ class MainActivity : BaseActivity() {
 
         val width = displayMetrics.widthPixels
         //val height = displayMetrics.heightPixels
-
         val frameWidth = width / DAY_LAYOUTS.size
-
         val currDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1
 
         for ( i in DAY_LAYOUTS.indices) {
@@ -54,19 +54,19 @@ class MainActivity : BaseActivity() {
             (currFrame.getChildAt(0) as TextView).text = getDayName( ( (currDayOfWeek + i) % 7 ) + 1 )
         }
 
+        sharedPreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        DAYS_TO_SHOW = sharedPreferences.getLong(PREF_DAYS_TO_SHOW, 7L)
+
         initializeChart()
-
         updateForecast()
-
     }
 
     override fun onStart() {
         super.onStart()
-        MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_1 * DAYS_TO_SHOW), ::setChartValues).execute()
+        updateChart()
     }
 
     private fun setChartValues(stats: List<Stats>) {
-        Log.d("############", stats.size.toString())
         if ( stats.isEmpty() ){
             val d = Description()
             d.text = "No data found"
@@ -88,7 +88,6 @@ class MainActivity : BaseActivity() {
         for ( i in 0 until DAYS_TO_SHOW) {
             k = sdf_statDB.format( Date(tmp) )
             barEntryLabels.add(k)
-            Log.d("############", k)
             if ( !m.containsKey(k) ) {
                 valuesYList.add( BarEntry(i.toFloat(), 0f ) )
             } else {
@@ -103,26 +102,31 @@ class MainActivity : BaseActivity() {
         val xAxis = mChart.xAxis
         xAxis.valueFormatter = IndexAxisValueFormatter(barEntryLabels)
 
-
         mChart.data = data
+        mChart.notifyDataSetChanged()
+        mChart.invalidate()
 
     }
 
     private fun initializeChart() {
         mChart = findViewById(R.id.mainactivity_barchart_statistics)
-        mChart.setBackgroundColor(Color.WHITE)
+        //mChart.setBackgroundColor(Color.WHITE)
         mChart.description.isEnabled = false
-        val bd = BarData()
-        bd.setValueTextColor(Color.BLACK)
+        mChart.legend.isEnabled = false
+        mChart.setTouchEnabled(false)
+        mChart.axisLeft.setDrawLabels(false)
+        mChart.animateY(500)
 
         val xAxis = mChart.xAxis
         xAxis.textSize = 9f
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
 
-        mChart.animateY(500)
+        mChart.data = BarData()
+    }
 
-        mChart.data = bd
+    private fun updateChart() {
+        MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_1 * DAYS_TO_SHOW), ::setChartValues).execute()
     }
 
     private fun getDayName(i: Int): String {
@@ -178,7 +182,6 @@ class MainActivity : BaseActivity() {
     private fun doForecast(location: Location?) {
         if(location != null) {
             val forecast = ArrayList<String>()
-            val sharedPreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val prefLatitude = sharedPreferences.getString(PREF_LATITUDE, "0.0")!!.toDouble()
             val prefLongitude = sharedPreferences.getString(PREF_LONGITUDE, "0.0")!!.toDouble()
             val prefTimeLastForecast = sharedPreferences.getLong(PREF_TIME_LAST_FORECAST, 0)
@@ -241,18 +244,31 @@ class MainActivity : BaseActivity() {
         startActivity(runningIntent)
     }
 
-    fun insertShitInDB(@Suppress("UNUSED_PARAMETER") v: View) {
-        MyInsertTask(this@MainActivity, Stats(Date(System.currentTimeMillis()), 1500)).execute()
+    fun insertRandomValuesInDB(@Suppress("UNUSED_PARAMETER") v: View) {
+        for (i in 0..365) {
+            val date = System.currentTimeMillis() - DAYS_1 * i
+            val r = Random
+            MyInsertTask(this@MainActivity, Stats(Date(date), abs(r.nextLong()%1000))).execute()
+        }
     }
 
-    fun retrieveShitFromDB(@Suppress("UNUSED_PARAMETER") v: View){
-        //RetrieveTask(this@MainActivity, Date(System.currentTimeMillis()-300000)).execute()
-        MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_7), ::setResults).execute()
+    private fun setDaysToShow(value: Long) {
+        DAYS_TO_SHOW = value
+        val e = sharedPreferences.edit()
+        e.putLong(PREF_DAYS_TO_SHOW, DAYS_TO_SHOW)
+        e.apply()
+        updateChart()
     }
 
-    private fun setResults(stats: List<Stats>) {
-        val tw = findViewById<TextView>(R.id.mainactivity_db_values)
-        setTextView(tw, stats.toString())
+    fun set7Days(@Suppress("UNUSED_PARAMETER")  v: View) {
+        setDaysToShow(7)
     }
 
+    fun set30Days(@Suppress("UNUSED_PARAMETER")  v: View) {
+        setDaysToShow(30)
+    }
+
+    fun set365Days(@Suppress("UNUSED_PARAMETER")  v: View) {
+        setDaysToShow(365)
+    }
 }

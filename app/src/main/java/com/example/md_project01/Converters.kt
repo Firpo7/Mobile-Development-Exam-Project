@@ -15,6 +15,6 @@ class Converters {
         return sdf.format(date)
     }
     companion object {
-        val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.US)
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     }
 }

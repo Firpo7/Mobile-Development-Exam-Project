@@ -144,7 +144,7 @@ open class BaseActivity : AppCompatActivity() {
 
         override fun doInBackground(vararg voids: Void?): List<Stats>? {
             db ?: return null
-            Log.d("RetrieveTask ######", "from: $from")
+            Log.d("[MyRetrieveTask]", "retrieving from: $from")
             return db!!.statDao().getLastNDays(from)
         }
 
@@ -173,10 +173,8 @@ open class BaseActivity : AppCompatActivity() {
         const val PREF_LONGITUDE = "longitudeForecast"
         const val PREF_TIME_LAST_FORECAST = "timeLastForecast"
         const val PREF_FORECAST = "forecast"
+        const val PREF_DAYS_TO_SHOW = "days_to_show"
         const val DAYS_1 = 1000L * 60 * 60 * 24//  day in milliseconds
-        const val DAYS_7 = 1000L * 60 * 60 * 24 * 7 // 7 days in milliseconds
-        const val DAYS_30 = 1000L * 60 * 60 * 24 * 30 // 30 days in milliseconds
-        const val DAYS_365 = 1000L * 60 * 60 * 24 * 365 // 365 days in milliseconds
 
         val sdf_statDB = SimpleDateFormat("dd-MM-yyyy", Locale.US)
 
