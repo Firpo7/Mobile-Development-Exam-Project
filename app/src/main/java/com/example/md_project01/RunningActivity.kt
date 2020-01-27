@@ -1,8 +1,13 @@
 package com.example.md_project01
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.os.Environment
 import android.os.Looper
 import android.util.Log
 import android.view.Menu
@@ -35,20 +40,23 @@ import java.util.concurrent.locks.ReentrantLock
 
 
 class RunningActivity : BaseActivity() {
-
-    private var lastLocation: Location? = null
+    private var dir: String = ""// = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
+//    private var lastLocation: Location? = null
 
     private lateinit var locationDisplay: LocationDisplay
 
-    private var locationCallback: LocationCallback? = null
-    private lateinit var locationRequest: LocationRequest
+//    private var locationCallback: LocationCallback? = null
+//    private lateinit var locationRequest: LocationRequest
     private lateinit var graphicsOverlay: GraphicsOverlay
     private var lastLineGraphic: Graphic? = null
     private var lastStartPointGraphic: Graphic? = null
     private var lastEndPointGraphic: Graphic? = null
+    private var pathTrace: Intent? = null
+    private val locationListener: BroadcastReceiver = LocationReceiver(this)
 
-    @Volatile
-    private var pathService: PathService? = null
+
+    //@Volatile
+    //private var pathService: PathService? = null
     private val sharedCounterLock = ReentrantLock()
     private var currentButtonState: ButtonState = ButtonState.START
     //private val locationSettingsRequest: LocationSettingsRequest? = null
@@ -56,6 +64,7 @@ class RunningActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_running)
+        dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
 
         val toolbar: Toolbar  = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -64,27 +73,34 @@ class RunningActivity : BaseActivity() {
         getLocationWithCallback { location: Location? ->
             initializeMap(location)
         }
-
+/*
         this.locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult) // why? this. is. retarded. Android.
                 updateDistance(locationResult.lastLocation)
             }
         }
-
+*/
+/*
         locationRequest = LocationRequest()
         locationRequest.interval = UPDATE_INTERVAL_MS
         locationRequest.fastestInterval = FASTEST_UPDATE_INTERVAL_MS
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+*/
+
 
     }
 
     override fun onPause() {
         super.onPause()
+        unregisterReceiver(locationListener)
         mapView.pause()
     }
     override fun onResume() {
         super.onResume()
+        val filter = IntentFilter()
+        filter.addAction(PathTraceService.NOTIFY)
+        registerReceiver(locationListener, filter)
         mapView.resume()
     }
     override fun onDestroy() {
@@ -114,7 +130,9 @@ class RunningActivity : BaseActivity() {
     }
 
     private fun shutdownScheduledTask() {
-        fusedLocationClient.removeLocationUpdates(this.locationCallback)
+        //fusedLocationClient.removeLocationUpdates(this.locationCallback)
+        Log.d("shutdownScheduledTask","shutdownScheduledTask")
+        if(pathTrace != null) stopService(pathTrace)
     }
 
     private fun initializeMap(location: Location?) {
@@ -195,7 +213,14 @@ class RunningActivity : BaseActivity() {
     }
 
 
+    private fun updateDistance(distance: Double){
+        setTextView(
+            findViewById(R.id.runningactivity_textview_distance),
+            distance.toLong().toString()
+        )
+    }
 
+/*
     private fun updateDistance(location: Location?) {
         if (location != null) {
             try {
@@ -216,7 +241,7 @@ class RunningActivity : BaseActivity() {
             Log.d("RUNNING SCHEDULED TASK", "null Location!!")
         }
     }
-
+*/
     fun buttonStartStop(@Suppress("UNUSED_PARAMETER") v: View) {
         currentButtonState = when(currentButtonState) {
             ButtonState.START -> {
@@ -239,22 +264,26 @@ class RunningActivity : BaseActivity() {
     private fun startRunning() {
         if(::locationDisplay.isInitialized) {
             if (!locationDisplay.isStarted) {
-
                 try {
                     sharedCounterLock.lock()
-                    pathService = PathService(System.currentTimeMillis(), this@RunningActivity)
-                    lastLocation = null
+                    val pt = Intent(this, PathTraceService::class.java)
+                    pt.putExtra(PathTraceService.EXTRA_DIR, dir)
+                    pathTrace = pt //stupid kotlin...
+                    startService(pathTrace)
+                    //pathService = PathService(System.currentTimeMillis(), dir/*this@RunningActivity*/)
+                    //lastLocation = null
                 } finally {
                     sharedCounterLock.unlock()
                 }
 
                 locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
                 locationDisplay.startAsync()
-                fusedLocationClient.requestLocationUpdates(
+                /*fusedLocationClient.requestLocationUpdates(
                     this.locationRequest,
                     this.locationCallback,
                     Looper.myLooper()
                 )
+                */
             }
         } else {
             //TODO: do something better
@@ -266,11 +295,11 @@ class RunningActivity : BaseActivity() {
         if(::locationDisplay.isInitialized)
             if (locationDisplay.isStarted) {
                 shutdownScheduledTask()
-                savePathMade()
                 locationDisplay.stop()
+                //savePathMade()
             }
     }
-
+/*
     private fun savePathMade() {
         if (checkPermissions(REQUEST_PERMISSION_READWRITE_ID)) {
             if (pathService != null) {
@@ -291,9 +320,9 @@ class RunningActivity : BaseActivity() {
             requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
         }
     }
-
+*/
     private fun loadPathFromJSON(json: String): PathService? {
-        val ps = PathService(ctx = this@RunningActivity)
+        val ps = PathService(dir = dir/*ctx = this@RunningActivity*/)
 
         val jsonObj = JSONObject(json.substring(json.indexOf("{"), json.lastIndexOf("}") + 1))
 
@@ -323,7 +352,7 @@ class RunningActivity : BaseActivity() {
         val builder = AlertDialog.Builder(this@RunningActivity)
         builder.setTitle("Choose some animals")
 
-        val fileList = PathService.getPastPathFilesList(this@RunningActivity)
+        val fileList = PathService.getPastPathFilesList(dir/*this@RunningActivity*/)
 
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->
@@ -359,7 +388,7 @@ class RunningActivity : BaseActivity() {
         val builder = AlertDialog.Builder(this@RunningActivity)
         builder.setTitle("Choose a path to load")
 
-        val fileList = PathService.getPastPathFilesList(this@RunningActivity)
+        val fileList = PathService.getPastPathFilesList(dir/*this@RunningActivity*/)
 
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->
@@ -382,6 +411,15 @@ class RunningActivity : BaseActivity() {
             showToast("No previous paths to show")
         }
     }
+
+    class LocationReceiver(private val ra: RunningActivity) : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val dist = intent.getDoubleExtra(PathTraceService.EXTRA_DIR, 0.0)
+            if(dist>0) ra.updateDistance(dist)
+        }
+    }
+
+
 
     companion object {
         private const val UPDATE_INTERVAL_MS: Long = 1000

@@ -1,8 +1,6 @@
 package com.example.md_project01
 
-import android.content.Context
 import android.location.Location
-import android.os.Environment
 import android.util.Log
 import java.io.File
 import java.io.PrintWriter
@@ -33,7 +31,7 @@ fun getStepDistance(prev: Location?, new: Location): Double {
 }
 
 
-class PathService(private val timestamp: Long = 0L, ctx: Context) {
+class PathService(private val timestamp: Long = 0L, public val dir: String/*ctx: Context*/) {
     @Volatile
     var distanceMade: Double = 0.0
     var lastLocation: Location? = null
@@ -44,7 +42,8 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
     val d_longitudes: ArrayList<Double> = ArrayList()
     private val buffer = PositionBuffer(10, 5)
 
-    private val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
+
+    //private val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
 
     fun addPoint(location: Location): Double? {
         Log.d("## addPoint ##", "lat=${location.latitude}, lon=${location.longitude}")
@@ -52,17 +51,15 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
         d_longitudes.add(location.longitude)
         val midp = buffer.add(Point(location.latitude, location.longitude))
         if(midp != null){
+            Log.d("## addPoint ##", "!+ lat=${midp.lat}, lon=${midp.lon}")
             latitudes.add(midp.lat)
             longitudes.add(midp.lon)
 
-            if (lastLocation != null) {
+            if (lastLocation != null)
                 distanceMade += getStepDistance(lastLocation, location)
-                lastLocation = location
-            } else
-                lastLocation = location
 
+            lastLocation = location
             return distanceMade
-            Log.d("## addPoint ##", "!+ lat=${midp.lat}, lon=${midp.lon}")
         }
         return null
     }
@@ -137,8 +134,8 @@ class PathService(private val timestamp: Long = 0L, ctx: Context) {
     }
 
     companion object {
-        fun getPastPathFilesList(ctx: Context): List<File>? {
-            val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
+        fun getPastPathFilesList(dir: String): List<File>? {
+            //val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
             if (checkDir(dir)) {
                 val dest = File(dir)
                 return dest.listFiles()?.filter { f ->
