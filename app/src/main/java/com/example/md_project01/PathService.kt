@@ -181,6 +181,7 @@ class PositionBuffer(private val bufSize: Int, private val flushDim: Int){
 
     fun midPoint(): Point {
         val p = Point(0.0,0.0)
+
         for(x in buffer){
             p.lat += x.lat
             p.lon += x.lon
