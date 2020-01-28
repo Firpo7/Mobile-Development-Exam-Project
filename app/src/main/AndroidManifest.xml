@@ -26,8 +26,7 @@
         <service
             android:name=".PathTraceService"
             android:exported="false"
-            android:enabled="true"
-            android:permission="android.permission.ACCESS_BACKGROUND_LOCATION" />
+            android:enabled="true" />
 
         <activity android:name=".BaseActivity" />
         <activity

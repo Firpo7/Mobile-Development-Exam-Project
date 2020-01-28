@@ -50,7 +50,7 @@ class PathTraceService : Service() {
         Log.d("[PathTraceService]", "Destroy!")
         fusedLocationClient.removeLocationUpdates(locationCallback)
         ps.save()
-        ps.d_save() //DEBUG
+        //ps.d_save() //DEBUG
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -58,12 +58,13 @@ class PathTraceService : Service() {
     }
 
     private fun updateTrace(loc: Location?){
+        Log.d("[PathTraceService]","updateTrace(${loc!=null})")
         if(loc != null){
             val newDistance = ps.addPoint(loc)
 
             if(newDistance != null){ //notify to running activity
-                val intent = Intent()
-                intent.action = NOTIFY
+                Log.d("[PathTraceService]","sendBroadcast! (dist=$newDistance)")
+                val intent = Intent(NOTIFY)
                 intent.putExtra(EXTRA_DISTANCE, newDistance)
                 sendBroadcast(intent)
             }

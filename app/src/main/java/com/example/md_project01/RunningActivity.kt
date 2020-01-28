@@ -52,7 +52,7 @@ class RunningActivity : BaseActivity() {
     private var lastStartPointGraphic: Graphic? = null
     private var lastEndPointGraphic: Graphic? = null
     private var pathTrace: Intent? = null
-    private val locationListener: BroadcastReceiver = LocationReceiver(this)
+    private lateinit var locationListener: BroadcastReceiver// = LocationReceiver(this)
 
 
     //@Volatile
@@ -73,6 +73,8 @@ class RunningActivity : BaseActivity() {
         getLocationWithCallback { location: Location? ->
             initializeMap(location)
         }
+
+        locationListener = LocationReceiver(this)
 /*
         this.locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -98,9 +100,7 @@ class RunningActivity : BaseActivity() {
     }
     override fun onResume() {
         super.onResume()
-        val filter = IntentFilter()
-        filter.addAction(PathTraceService.NOTIFY)
-        registerReceiver(locationListener, filter)
+        registerReceiver(locationListener, IntentFilter(PathTraceService.NOTIFY))
         mapView.resume()
     }
     override fun onDestroy() {
@@ -214,6 +214,7 @@ class RunningActivity : BaseActivity() {
 
 
     private fun updateDistance(distance: Double){
+        Log.d("[RunningActivity]", "updateDistance($distance)")
         setTextView(
             findViewById(R.id.runningactivity_textview_distance),
             distance.toLong().toString()
@@ -299,28 +300,8 @@ class RunningActivity : BaseActivity() {
                 //savePathMade()
             }
     }
-/*
-    private fun savePathMade() {
-        if (checkPermissions(REQUEST_PERMISSION_READWRITE_ID)) {
-            if (pathService != null) {
-                if ( pathService!!.distanceMade != 0.0 && pathService!!.save().not() )
-                    showToast("ERROR WHILE WRITING THE FILE")
-            }
-            requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
-        }
-        d_savePathMade()
-    }
 
-    private fun d_savePathMade() {
-        if (checkPermissions(REQUEST_PERMISSION_READWRITE_ID)) {
-            if (pathService != null) {
-                if ( pathService!!.distanceMade != 0.0 && pathService!!.d_save().not() )
-                    showToast("ERROR WHILE WRITING THE FILE")
-            }
-            requestPermissions(REQUEST_PERMISSION_READWRITE_ID)
-        }
-    }
-*/
+
     private fun loadPathFromJSON(json: String): PathService? {
         val ps = PathService(dir = dir/*ctx = this@RunningActivity*/)
 
@@ -392,9 +373,9 @@ class RunningActivity : BaseActivity() {
 
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->
-                //val timestamp = fileList[i].name.split(".")[0].toLong()
-                //val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
-                //sdf.format(Date(timestamp))
+                val timestamp = fileList[i].name.split(".")[0].toLong()
+                val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
+                sdf.format(Date(timestamp))
                 fileList[i].name
             }
 
@@ -414,7 +395,8 @@ class RunningActivity : BaseActivity() {
 
     class LocationReceiver(private val ra: RunningActivity) : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val dist = intent.getDoubleExtra(PathTraceService.EXTRA_DIR, 0.0)
+            val dist = intent.getDoubleExtra(PathTraceService.EXTRA_DISTANCE, 0.0)
+            Log.d("[LocationReceiver]", "dist=$dist")
             if(dist>0) ra.updateDistance(dist)
         }
     }
@@ -422,8 +404,8 @@ class RunningActivity : BaseActivity() {
 
 
     companion object {
-        private const val UPDATE_INTERVAL_MS: Long = 1000
-        private const val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
+//        private const val UPDATE_INTERVAL_MS: Long = 1000
+//        private const val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
         private const val GCS_WGS84 = 4326 // Geographic coordinate systems returned from a GPS device
 
         private enum class ButtonState {START, STOP}

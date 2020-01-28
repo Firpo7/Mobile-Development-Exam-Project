@@ -31,7 +31,7 @@ fun getStepDistance(prev: Location?, new: Location): Double {
 }
 
 
-class PathService(private val timestamp: Long = 0L, public val dir: String/*ctx: Context*/) {
+class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Context*/) {
     @Volatile
     var distanceMade: Double = 0.0
     var lastLocation: Location? = null
@@ -46,12 +46,12 @@ class PathService(private val timestamp: Long = 0L, public val dir: String/*ctx:
     //private val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
 
     fun addPoint(location: Location): Double? {
-        Log.d("## addPoint ##", "lat=${location.latitude}, lon=${location.longitude}")
+        Log.d("[PathService]", "coord=${location.latitude},${location.longitude}")
         d_latitudes.add(location.latitude)
         d_longitudes.add(location.longitude)
         val midp = buffer.add(Point(location.latitude, location.longitude))
         if(midp != null){
-            Log.d("## addPoint ##", "!+ lat=${midp.lat}, lon=${midp.lon}")
+            Log.d("[PathService]", "ADD! coord=${midp.lat},${midp.lon}")
             latitudes.add(midp.lat)
             longitudes.add(midp.lon)
 
@@ -67,12 +67,6 @@ class PathService(private val timestamp: Long = 0L, public val dir: String/*ctx:
     fun save(): Boolean {
         if (timestamp == 0L || latitudes.isEmpty() || longitudes.isEmpty()) return false
         //save() and addPoint() are thread safe?
-
-        //distanceMade = distance
-     /*   Log.d("[PathService]", "distanceMade: $distanceMade")
-        Log.d("[PathService]", "latitudes: $latitudes")
-        Log.d("[PathService]", "longitudes: $longitudes")
-        Log.d("[PathService]", this.toString())*/
 
         val filename = "$timestamp.json"
         Log.d("[PathService]", "$dir/$filename")
@@ -99,14 +93,9 @@ class PathService(private val timestamp: Long = 0L, public val dir: String/*ctx:
         return "{\"distanceMade\": \"$distanceMade\",\"latitudes\":$latitudes,\"longitudes\":$longitudes}"
     }
 
+    /* DEBUG STUFF (maybe can help in future)
     fun d_save(): Boolean {
         if (timestamp == 0L) return false
-
-        //distanceMade = distance
-        /*   Log.d("[PathService]", "distanceMade: $distanceMade")
-           Log.d("[PathService]", "latitudes: $latitudes")
-           Log.d("[PathService]", "longitudes: $longitudes")
-           Log.d("[PathService]", this.toString())*/
 
         val filename = "d_$timestamp.json"
         Log.d("[PathService]", "$dir/$filename")
@@ -132,7 +121,7 @@ class PathService(private val timestamp: Long = 0L, public val dir: String/*ctx:
     fun d_toString(): String {
         return "{\"distanceMade\": \"$distanceMade\",\"latitudes\":$d_latitudes,\"longitudes\":$d_longitudes}"
     }
-
+    */
     companion object {
         fun getPastPathFilesList(dir: String): List<File>? {
             //val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
@@ -140,7 +129,7 @@ class PathService(private val timestamp: Long = 0L, public val dir: String/*ctx:
                 val dest = File(dir)
                 return dest.listFiles()?.filter { f ->
                     try {
-                        f.name.split(".")[0]//.toLong()
+                        f.name.split(".")[0].toLong()
 
                         /*
                          * TODO: check that files contain a valid JSON (?)
@@ -189,7 +178,6 @@ class PositionBuffer(private val bufSize: Int, private val flushDim: Int){
         p.lat /= buffer.size
         p.lon /= buffer.size
         return p
-        //TODO: remove outlier from result (?)
     }
 
     fun flush(n: Int){
