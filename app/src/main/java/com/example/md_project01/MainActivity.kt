@@ -68,12 +68,10 @@ class MainActivity : BaseActivity() {
 
     private fun setChartValues(stats: List<Stats>) {
         if ( stats.isEmpty() ){
-            val d = Description()
-            d.text = "No data found"
-            mChart.description = d
+            mChart.description.isEnabled = true
             return
         }
-
+        mChart.description.isEnabled = false
         val m = mutableMapOf<String, Stats>()
         val now = System.currentTimeMillis()
         var tmp = now - DAYS_1 * (DAYS_TO_SHOW-1)
@@ -96,21 +94,23 @@ class MainActivity : BaseActivity() {
             tmp += DAYS_1
         }
 
-        val barYSet = BarDataSet(valuesYList, "Distance Made")
+        val barYSet = BarDataSet(valuesYList, "m")
         barYSet.color = Color.RED
+        
         val data = BarData(barYSet)
-        val xAxis = mChart.xAxis
-        xAxis.valueFormatter = IndexAxisValueFormatter(barEntryLabels)
-
+        mChart.xAxis.valueFormatter = IndexAxisValueFormatter(barEntryLabels)
         mChart.data = data
+
         mChart.notifyDataSetChanged()
         mChart.invalidate()
-
     }
 
     private fun initializeChart() {
         mChart = findViewById(R.id.mainactivity_barchart_statistics)
         //mChart.setBackgroundColor(Color.WHITE)
+        val d = Description()
+        d.text = "No data found"
+        mChart.description = d
         mChart.description.isEnabled = false
         mChart.legend.isEnabled = false
         mChart.setTouchEnabled(false)
@@ -247,8 +247,7 @@ class MainActivity : BaseActivity() {
     fun insertRandomValuesInDB(@Suppress("UNUSED_PARAMETER") v: View) {
         for (i in 0..365) {
             val date = System.currentTimeMillis() - DAYS_1 * i
-            val r = Random
-            MyInsertTask(this@MainActivity, Stats(Date(date), abs(r.nextLong()%1000))).execute()
+            MyInsertTask(this@MainActivity, Stats(Date(date), abs(Random.nextLong()%1000))).execute()
         }
     }
 

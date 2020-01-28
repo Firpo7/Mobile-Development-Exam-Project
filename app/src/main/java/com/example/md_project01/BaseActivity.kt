@@ -149,10 +149,10 @@ open class BaseActivity : AppCompatActivity() {
         }
 
         override fun onPostExecute(stats: List<Stats>?) {
-            if (stats != null && stats.isNotEmpty()) {
+            if (stats != null) {
                 callback(stats)
             } else {
-                Log.d("MyRetrieveTask #####", "No data found in DB")
+                Log.d("MyRetrieveTask #####", "Error while retrieving datas in DB")
             }
         }
 
