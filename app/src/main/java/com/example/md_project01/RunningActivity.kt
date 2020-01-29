@@ -296,11 +296,16 @@ class RunningActivity : BaseActivity() {
         if(::locationDisplay.isInitialized)
             if (locationDisplay.isStarted) {
                 shutdownScheduledTask()
+                saveStats()
                 locationDisplay.stop()
                 //savePathMade()
             }
     }
 
+
+    private fun saveStats() {
+        MyInsertTask(this@RunningActivity, Stats(Date(pathService!!.timestamp), pathService!!.distanceMade.toLong())).execute()
+    }
 
     private fun loadPathFromJSON(json: String): PathService? {
         val ps = PathService(dir = dir/*ctx = this@RunningActivity*/)

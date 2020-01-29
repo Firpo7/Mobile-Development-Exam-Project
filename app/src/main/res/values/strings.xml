@@ -10,4 +10,6 @@
     <string name="mainactivity_textview_run_suggestion_good">TODAY IS A GOOD DAY!!</string>
     <string name="mainactivity_textview_run_suggestion_bad">MAYBE NOT TODAY..</string>
 
+    <string name="mainactivity_textview_your_stats">Here is your stats!!</string>
+
 </resources>

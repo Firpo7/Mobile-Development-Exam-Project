@@ -9,7 +9,9 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.location.Location
 import android.location.LocationManager
+import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +19,12 @@ import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import java.util.concurrent.Callable
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.google.android.gms.location.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -31,6 +39,7 @@ open class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
     }
 
     override fun onResume() {
@@ -138,6 +147,50 @@ open class BaseActivity : AppCompatActivity() {
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
     }
 
+    class MyInsertTask internal constructor(context: Context, private val stat: Stats): AsyncTask<Void?, Void?, Boolean>() {
+
+        //private val activityReference: WeakReference<MainActivity> = WeakReference(context)
+        var db: StatDatabase? = null
+
+        override fun doInBackground(vararg objs: Void?): Boolean {
+            db ?: return false
+            db!!.statDao().upsert(stat)
+            return true
+        }
+
+        // onPostExecute runs on main thread
+        override fun onPostExecute(bool: Boolean) {
+
+        }
+
+        init {
+            db = openDB(context)
+        }
+    }
+
+    class MyRetrieveTask internal constructor(context: Context, private val from: Date, private val callback: (stats: List<Stats> ) -> Unit): AsyncTask<Void?, Void?, List<Stats>?>() {
+        var db: StatDatabase? = null
+
+        override fun doInBackground(vararg voids: Void?): List<Stats>? {
+            db ?: return null
+            Log.d("[MyRetrieveTask]", "retrieving from: $from")
+            return db!!.statDao().getLastNDays(from)
+        }
+
+        override fun onPostExecute(stats: List<Stats>?) {
+            if (stats != null) {
+                callback(stats)
+            } else {
+                Log.d("MyRetrieveTask #####", "Error while retrieving datas in DB")
+            }
+        }
+
+        init {
+            db = openDB(context)
+        }
+
+    }
+
     companion object {
         const val REQUEST_PERMISSION_LOCATION_ID = 42
         const val REQUEST_PERMISSION_READWRITE_ID = 1337
@@ -149,6 +202,10 @@ open class BaseActivity : AppCompatActivity() {
         const val PREF_LONGITUDE = "longitudeForecast"
         const val PREF_TIME_LAST_FORECAST = "timeLastForecast"
         const val PREF_FORECAST = "forecast"
+        const val PREF_DAYS_TO_SHOW = "days_to_show"
+        const val DAYS_1 = 1000L * 60 * 60 * 24//  day in milliseconds
+
+        val sdf_statDB = SimpleDateFormat("dd-MM-yyyy", Locale.US)
 
         val Int.dp: Int get() = (this / Resources.getSystem().displayMetrics.density).toInt()
         val Int.px: Int get() = (this * Resources.getSystem().displayMetrics.density).toInt()
