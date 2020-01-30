@@ -5,6 +5,7 @@ import android.util.Log
 import java.io.File
 import java.io.PrintWriter
 import java.util.*
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.collections.ArrayList
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -122,7 +123,76 @@ class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Contex
         return "{\"distanceMade\": \"$distanceMade\",\"latitudes\":$d_latitudes,\"longitudes\":$d_longitudes}"
     }
     */
+
+    /*🡓🡓🡓 Test for "static" data 🡓🡓🡓*/
+
+    fun addNewPoint(location: Location): Double? {
+        Log.d("[PathService]", "coord=${location.latitude},${location.longitude}")
+        val midp = buffer.add(Point(location.latitude, location.longitude))
+        if(midp != null){
+            Log.d("[PathService]", "ADD! coord=${midp.lat},${midp.lon}")
+
+            mal.lock()
+            _latitudes.add(midp.lat)
+            _longitudes.add(midp.lon)
+
+            if (lastLocation != null)
+                distance += getStepDistance(lastLocation, location)
+
+            mal.unlock()
+
+            lastLocation = location
+            return distanceMade
+        }
+        return null
+    }
+
     companion object {
+        private val _longitudes: MutableList<Double> = mutableListOf()
+        private val _latitudes: MutableList<Double> = mutableListOf()
+        private var distance = 0.0
+        private val mal = ReentrantLock()
+
+        fun getLatitude(): MutableList<Double>{
+            mal.lock() // C was here!
+            try{
+                return _latitudes //TODO: copy?
+            }
+            finally {
+                mal.unlock()
+            }
+        }
+
+        fun getLongitude(): MutableList<Double>{
+            mal.lock()
+            try{
+                return _longitudes //TODO: copy?
+            }
+            finally {
+                mal.unlock()
+            }
+        }
+
+        fun getDistance(): Double{
+            mal.lock()
+            try{
+                return distance
+            }
+            finally {
+                mal.unlock()
+            }
+        }
+
+        fun clearData(){
+            mal.lock()
+            _latitudes.clear()
+            _longitudes.clear()
+            distance *= 0
+            mal.unlock()
+        }
+
+        /*🡑🡑🡑 Test for "static" data 🡑🡑🡑*/
+
         fun getPastPathFilesList(dir: String): List<File>? {
             //val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
             if (checkDir(dir)) {
@@ -154,6 +224,8 @@ class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Contex
         }
     }
 }
+
+
 
 class PositionBuffer(private val bufSize: Int, private val flushDim: Int){
     private var buffer: LinkedList<Point> = LinkedList()
