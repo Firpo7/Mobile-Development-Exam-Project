@@ -38,8 +38,8 @@ class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Contex
     val latitudes: ArrayList<Double> = ArrayList()
     val longitudes: ArrayList<Double> = ArrayList()
 
-    val d_latitudes: ArrayList<Double> = ArrayList()
-    val d_longitudes: ArrayList<Double> = ArrayList()
+    //val d_latitudes: ArrayList<Double> = ArrayList()
+    //val d_longitudes: ArrayList<Double> = ArrayList()
     private val buffer = PositionBuffer(10, 5)
 
 
@@ -47,8 +47,8 @@ class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Contex
 
     fun addPoint(location: Location): Double? {
         Log.d("[PathService]", "coord=${location.latitude},${location.longitude}")
-        d_latitudes.add(location.latitude)
-        d_longitudes.add(location.longitude)
+        //d_latitudes.add(location.latitude)
+        //d_longitudes.add(location.longitude)
         val midp = buffer.add(Point(location.latitude, location.longitude))
         if(midp != null){
             Log.d("[PathService]", "ADD! coord=${midp.lat},${midp.lon}")
