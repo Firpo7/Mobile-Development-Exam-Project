@@ -91,7 +91,14 @@ class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Contex
     }
 
     override fun toString(): String {
-        return "{\"distanceMade\": \"$distanceMade\",\"latitudes\":$latitudes,\"longitudes\":$longitudes}"
+        //return "{\"distanceMade\": \"$distanceMade\",\"latitudes\":$latitudes,\"longitudes\":$longitudes}"
+        mal.lock()
+        try {
+            return "{\"distanceMade\": \"$distance\",\"latitudes\":$_latitudes,\"longitudes\":$_longitudes}"
+        }
+        finally {
+            mal.unlock()
+        }
     }
 
     /* DEBUG STUFF (maybe can help in future)

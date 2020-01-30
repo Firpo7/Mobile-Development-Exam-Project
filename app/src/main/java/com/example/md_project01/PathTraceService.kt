@@ -60,7 +60,8 @@ class PathTraceService : Service() {
     private fun updateTrace(loc: Location?){
         Log.d("[PathTraceService]","updateTrace(${loc!=null})")
         if(loc != null){
-            val newDistance = ps.addPoint(loc)
+            //val newDistance = ps.addPoint(loc)
+            val newDistance = ps.addNewPoint(loc)
 
             if(newDistance != null){ //notify to running activity
                 Log.d("[PathTraceService]","sendBroadcast! (dist=$newDistance)")
