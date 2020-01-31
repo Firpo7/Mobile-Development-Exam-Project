@@ -308,10 +308,6 @@ class RunningActivity : BaseActivity() {
     }
 
 
-    private fun saveStats() {
-        MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), distanceMade.toLong())).execute()
-    }
-
     private fun loadPathFromJSON(json: String): PathTraceService? {
         val ps = PathTraceService()
 
