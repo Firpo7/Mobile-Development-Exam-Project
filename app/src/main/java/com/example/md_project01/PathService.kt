@@ -14,24 +14,6 @@ import kotlin.math.sqrt
 
 
 
-fun getStepDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
-    val earthRadius = 6371000.0 //meters
-    val dLat = Math.toRadians((lat2 - lat1))
-    val dLng = Math.toRadians((lng2 - lng1))
-    val a = sin(dLat/2) * sin(dLat/2) + cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(dLng/2) * sin(dLng/2)
-    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-    return (earthRadius * c)
-}
-
-fun getStepDistance(prev: Location?, new: Location): Double {
-    return if (prev != null)
-        getStepDistance(lat1 = prev.latitude, lat2 = new.latitude, lng1 = prev.longitude, lng2 =  new.longitude)
-    else
-        0.0
-}
-
-
 class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Context*/) {
     @Volatile
     var distanceMade: Double = 0.0
@@ -66,7 +48,7 @@ class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Contex
     }
 
     fun save(): Boolean {
-        if (timestamp == 0L || latitudes.isEmpty() || longitudes.isEmpty()) return false
+        if (timestamp == 0L || _latitudes.isEmpty() || _longitudes.isEmpty()) return false
         //save() and addPoint() are thread safe?
 
         val filename = "$timestamp.json"
@@ -149,7 +131,7 @@ class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Contex
             mal.unlock()
 
             lastLocation = location
-            return distanceMade
+            return distance
         }
         return null
     }
@@ -160,30 +142,45 @@ class PathService(private val timestamp: Long = 0L, val dir: String/*ctx: Contex
         private var distance = 0.0
         private val mal = ReentrantLock()
 
-        fun getLatitude(): MutableList<Double>{
-            mal.lock() // C was here!
-            try{
-                return _latitudes //TODO: copy?
-            }
-            finally {
-                mal.unlock()
-            }
-        }
-
-        fun getLongitude(): MutableList<Double>{
-            mal.lock()
-            try{
-                return _longitudes //TODO: copy?
-            }
-            finally {
-                mal.unlock()
-            }
-        }
-
         fun getDistance(): Double{
             mal.lock()
             try{
                 return distance
+            }
+            finally {
+                mal.unlock()
+            }
+        }
+
+        fun save(timestamp: Long, dir: String): Boolean {
+            if (timestamp == 0L || _latitudes.isEmpty() || _longitudes.isEmpty()) return false
+            //save() and addPoint() are thread safe?
+
+            val filename = "$timestamp.json"
+            Log.d("[PathService]", "$dir/$filename")
+            return if (checkDir(dir)) {
+                // directory exists or already created
+                val dest = File(dir, filename)
+                try {
+                    // response is the data written to file
+                    PrintWriter(dest).use { out -> out.println(toJSON()) }
+                    true
+                } catch (e: Exception) {
+                    // handle the exception
+                    Log.d("Write File Failed", e.message.toString())
+                    false
+                }
+
+            } else {
+                // directory creation is not successful
+                false
+            }
+        }
+
+        fun toJSON(): String {
+            mal.lock()
+            try {
+                return "{\"distanceMade\": \"$distance\",\"latitudes\":$_latitudes,\"longitudes\":$_longitudes}"
             }
             finally {
                 mal.unlock()

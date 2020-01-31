@@ -132,6 +132,7 @@ class RunningActivity : BaseActivity() {
     private fun shutdownScheduledTask() {
         //fusedLocationClient.removeLocationUpdates(this.locationCallback)
         Log.d("shutdownScheduledTask","shutdownScheduledTask")
+        MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), PathService.getDistance().toLong())).execute()
         if(pathTrace != null) stopService(pathTrace)
     }
 
@@ -267,12 +268,9 @@ class RunningActivity : BaseActivity() {
             if (!locationDisplay.isStarted) {
                 try {
                     sharedCounterLock.lock()
-                    val pt = Intent(this, PathTraceService::class.java)
-                    pt.putExtra(PathTraceService.EXTRA_DIR, dir)
-                    pathTrace = pt //stupid kotlin...
+                    pathTrace = Intent(this, PathTraceService::class.java)
+                    pathTrace!!.putExtra(PathTraceService.EXTRA_DIR, dir)
                     startService(pathTrace)
-                    //pathService = PathService(System.currentTimeMillis(), dir/*this@RunningActivity*/)
-                    //lastLocation = null
                 } finally {
                     sharedCounterLock.unlock()
                 }
@@ -295,7 +293,7 @@ class RunningActivity : BaseActivity() {
     private fun stopRunning() {
         if(::locationDisplay.isInitialized)
             if (locationDisplay.isStarted) {
-                saveStats()
+                //saveStats()
                 shutdownScheduledTask()
                 locationDisplay.stop()
                 //savePathMade()

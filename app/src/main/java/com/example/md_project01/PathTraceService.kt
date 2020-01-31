@@ -50,6 +50,7 @@ class PathTraceService : Service() {
         Log.d("[PathTraceService]", "Destroy!")
         fusedLocationClient.removeLocationUpdates(locationCallback)
         ps.save()
+        PathService.clearData()
         //ps.d_save() //DEBUG
     }
 
