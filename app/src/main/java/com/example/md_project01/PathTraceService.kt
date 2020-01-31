@@ -1,19 +1,22 @@
 package com.example.md_project01
 
-import android.app.Service
+import android.R
+import android.app.*
 import android.content.Intent
 import android.location.Location
+import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.*
 import java.io.File
 import java.io.PrintWriter
 import java.util.*
-import java.util.concurrent.locks.ReentrantLock
 
 
 class PathTraceService : Service() {
+    val CHANNEL_ID = "PathTraceServiceChannel"
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var locationRequest = LocationRequest()
     var locationCallback = object : LocationCallback() {
@@ -31,9 +34,25 @@ class PathTraceService : Service() {
     private var timestamp: Long = 0
 
 
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val serviceChannel = NotificationChannel(
+                CHANNEL_ID,
+                "Foreground PathTraceService Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(
+                NotificationManager::class.java
+            )
+            manager!!.createNotificationChannel(serviceChannel)
+        }
+    }
+
+
     override fun onCreate() {
         super.onCreate()
         Log.d("[PathTraceService]", "create")
+        createNotificationChannel()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationRequest.interval = 1000
         locationRequest.fastestInterval = 1000
@@ -49,6 +68,15 @@ class PathTraceService : Service() {
             this.locationCallback,
             Looper.myLooper()
         )
+
+        val pendingIntent = PendingIntent.getActivity(this,0, Intent(this, RunningActivity::class.java), 0)
+        val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Foreground Service")
+            .setContentText("ajeje")
+            //.setSmallIcon(R.drawable.ic_stat_name)
+            .setContentIntent(pendingIntent)
+            .build()
+        startForeground(1, notification)
 
         return super.onStartCommand(intent, flags, startId)
     }
