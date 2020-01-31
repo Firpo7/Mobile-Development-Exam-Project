@@ -18,17 +18,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import java.util.concurrent.Callable
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import com.google.android.gms.location.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 
 open class BaseActivity : AppCompatActivity() {
@@ -158,11 +150,6 @@ open class BaseActivity : AppCompatActivity() {
             return true
         }
 
-        // onPostExecute runs on main thread
-        override fun onPostExecute(bool: Boolean) {
-
-        }
-
         init {
             db = openDB(context)
         }
@@ -209,6 +196,10 @@ open class BaseActivity : AppCompatActivity() {
 
         val Int.dp: Int get() = (this / Resources.getSystem().displayMetrics.density).toInt()
         val Int.px: Int get() = (this * Resources.getSystem().displayMetrics.density).toInt()
+
+        fun openDB(context: Context): StatDatabase? {
+            return StatDatabase.getInstance(context)
+        }
 
     }
 

@@ -295,8 +295,8 @@ class RunningActivity : BaseActivity() {
     private fun stopRunning() {
         if(::locationDisplay.isInitialized)
             if (locationDisplay.isStarted) {
-                shutdownScheduledTask()
                 saveStats()
+                shutdownScheduledTask()
                 locationDisplay.stop()
                 //savePathMade()
             }
@@ -304,7 +304,7 @@ class RunningActivity : BaseActivity() {
 
 
     private fun saveStats() {
-        MyInsertTask(this@RunningActivity, Stats(Date(pathService!!.timestamp), pathService!!.distanceMade.toLong())).execute()
+        MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), PathService.getDistance().toLong())).execute()
     }
 
     private fun loadPathFromJSON(json: String): PathService? {
