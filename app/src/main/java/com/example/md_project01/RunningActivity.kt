@@ -53,6 +53,7 @@ class RunningActivity : BaseActivity() {
     private var lastEndPointGraphic: Graphic? = null
     private var pathTrace: Intent? = null
     private lateinit var locationListener: BroadcastReceiver// = LocationReceiver(this)
+    private var distanceMade = 0.0
 
 
     //@Volatile
@@ -132,7 +133,7 @@ class RunningActivity : BaseActivity() {
     private fun shutdownScheduledTask() {
         //fusedLocationClient.removeLocationUpdates(this.locationCallback)
         Log.d("shutdownScheduledTask","shutdownScheduledTask")
-        MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), PathService.getDistance().toLong())).execute()
+        MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), distanceMade.toLong())).execute()
         if(pathTrace != null) stopService(pathTrace)
     }
 
@@ -155,11 +156,16 @@ class RunningActivity : BaseActivity() {
         locationDisplay = mapView.locationDisplay
     }
 
-    private fun addPathLayer(ps: PathService) {
+    private fun addPathLayer(ps: PathTraceService) {
         val points = PointCollection(SpatialReference.create(GCS_WGS84))
         var meanLongitudes = 0.0
         var meanLatitudes = 0.0
         val numCoordinates = ps.latitudes.size
+
+        setTextView(
+            findViewById(R.id.runningactivity_textview_distance),
+            ps.distanceMade.toLong().toString()
+        )
 
         for (i in 0 until numCoordinates) {
             points.add(ps.longitudes[i], ps.latitudes[i])
@@ -216,6 +222,7 @@ class RunningActivity : BaseActivity() {
 
     private fun updateDistance(distance: Double){
         Log.d("[RunningActivity]", "updateDistance($distance)")
+        distanceMade = distance
         setTextView(
             findViewById(R.id.runningactivity_textview_distance),
             distance.toLong().toString()
@@ -302,11 +309,11 @@ class RunningActivity : BaseActivity() {
 
 
     private fun saveStats() {
-        MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), PathService.getDistance().toLong())).execute()
+        MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), distanceMade.toLong())).execute()
     }
 
-    private fun loadPathFromJSON(json: String): PathService? {
-        val ps = PathService(dir = dir/*ctx = this@RunningActivity*/)
+    private fun loadPathFromJSON(json: String): PathTraceService? {
+        val ps = PathTraceService()
 
         val jsonObj = JSONObject(json.substring(json.indexOf("{"), json.lastIndexOf("}") + 1))
 
@@ -336,7 +343,7 @@ class RunningActivity : BaseActivity() {
         val builder = AlertDialog.Builder(this@RunningActivity)
         builder.setTitle("Choose some animals")
 
-        val fileList = PathService.getPastPathFilesList(dir/*this@RunningActivity*/)
+        val fileList = PathTraceService.getPastPathFilesList(dir)
 
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->
@@ -372,7 +379,7 @@ class RunningActivity : BaseActivity() {
         val builder = AlertDialog.Builder(this@RunningActivity)
         builder.setTitle("Choose a path to load")
 
-        val fileList = PathService.getPastPathFilesList(dir/*this@RunningActivity*/)
+        val fileList = PathTraceService.getPastPathFilesList(dir)
 
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->
