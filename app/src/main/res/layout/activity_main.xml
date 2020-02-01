@@ -157,7 +157,7 @@
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="0dp"
         android:layout_height="100dp"
-        android:background="@android:color/holo_blue_dark"
+        android:background="@color/color_teal"
         android:onClick="startRunPressed"
         android:text="@string/mainactivity_button_start_running"
         android:textColor="@android:color/white"

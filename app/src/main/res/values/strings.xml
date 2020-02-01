@@ -4,12 +4,27 @@
     <string name="runningactivity_textview_distance"> Distance: </string>
     <string name="runningactivity_button_start">START</string>
     <string name="runningactivity_button_stop">STOP</string>
+    <string name="runningactivity_title_dialog_choosepath">Choose a path to load</string>
+    <string name="runningactivity_title_dialog_deletepath">Choose the paths to delete</string>
+    <string name="runningactivity_toast_no_past_path_found">No previous path to show</string>
 
     <string name="mainactivity_button_start_running">START RUNNING!!</string>
-
     <string name="mainactivity_textview_run_suggestion_good">TODAY IS A GOOD DAY!!</string>
     <string name="mainactivity_textview_run_suggestion_bad">MAYBE NOT TODAY..</string>
-
     <string name="mainactivity_textview_your_stats">Here is your stats!!</string>
 
+    <string name="day_monday">Mon</string>
+    <string name="day_tuesday">Tue</string>
+    <string name="day_wednesday">Wed</string>
+    <string name="day_thursday">Thu</string>
+    <string name="day_friday">Fri</string>
+    <string name="day_saturday">Sat</string>
+    <string name="day_sunday">Sun</string>
+    <string name="day_error">Err</string>
+
+    <string name="no_chart_data_found">No data found</string>
+
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="error_location_disabled">Error, is location enable?</string>
 </resources>

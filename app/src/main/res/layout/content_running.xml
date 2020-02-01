@@ -25,7 +25,7 @@
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="0dp"
         android:layout_height="100dp"
-        android:background="@android:color/holo_green_light"
+        android:background="@color/color_teal"
         android:onClick="buttonStartStop"
         android:text="@string/runningactivity_button_start"
         android:textColor="@android:color/white"

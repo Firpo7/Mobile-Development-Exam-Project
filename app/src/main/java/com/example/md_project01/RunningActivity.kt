@@ -144,7 +144,7 @@ class RunningActivity : BaseActivity() {
             lat = location.latitude
             lon = location.longitude
         } else {
-            showToast("ERROR LOADING LOCATION")
+            showToast( getResourceString(R.string.error_location_disabled) )
         }
         val map = ArcGISMap(Basemap.Type.DARK_GRAY_CANVAS_VECTOR, lat, lon, 18)
         mapView.map = map
@@ -256,7 +256,7 @@ class RunningActivity : BaseActivity() {
             ButtonState.START -> {
                 val button = findViewById<Button>(R.id.runningactivity_button_start)
                 button.text = resources.getText(R.string.runningactivity_button_stop)
-                button.setBackgroundResource(R.color.color_red_button_stop)
+                button.setBackgroundResource(R.color.color_dark_orange)
                 startRunning()
                 ButtonState.STOP
             }
@@ -264,7 +264,7 @@ class RunningActivity : BaseActivity() {
                 stopRunning()
                 val button = findViewById<Button>(R.id.runningactivity_button_start)
                 button.text = resources.getText(R.string.runningactivity_button_start)
-                button.setBackgroundResource(R.color.color_green_button_start)
+                button.setBackgroundResource(R.color.color_teal)
                 ButtonState.START
             }
         }
@@ -293,7 +293,7 @@ class RunningActivity : BaseActivity() {
             }
         } else {
             //TODO: do something better
-            showToast("Unable to start running, is location enable?")
+            showToast( getResourceString(R.string.error_location_disabled) )
         }
     }
 
@@ -314,7 +314,7 @@ class RunningActivity : BaseActivity() {
         val jsonObj = JSONObject(json.substring(json.indexOf("{"), json.lastIndexOf("}") + 1))
 
         try {
-            ps.distanceMade = jsonObj.getString("distanceMade").toDouble()
+            ps.distanceMade = jsonObj.getDouble("distanceMade")
         } catch (e: Exception) {
             return null
         }
@@ -337,7 +337,7 @@ class RunningActivity : BaseActivity() {
     private fun deleteSavedPath() {
         val filesToDelete = mutableSetOf<File>()
         val builder = AlertDialog.Builder(this@RunningActivity)
-        builder.setTitle("Choose some animals")
+        builder.setTitle( getResourceString(R.string.runningactivity_title_dialog_deletepath) )
 
         val fileList = PathTraceService.getPastPathFilesList(dir)
 
@@ -356,14 +356,14 @@ class RunningActivity : BaseActivity() {
                 }
             }
 
-            builder.setPositiveButton("Delete") { _, _ ->
+            builder.setPositiveButton( getResourceString(R.string.delete) ) { _, _ ->
                 // user clicked OK
                 for ( f in filesToDelete) {
                     f.delete()
                 }
             }
 
-            builder.setNegativeButton("Cancel", null)
+            builder.setNegativeButton( getResourceString(R.string.cancel), null)
 
             val dialog = builder.create()
             dialog.show()
@@ -373,7 +373,7 @@ class RunningActivity : BaseActivity() {
 
     private fun showPathHistories() {
         val builder = AlertDialog.Builder(this@RunningActivity)
-        builder.setTitle("Choose a path to load")
+        builder.setTitle( getResourceString(R.string.runningactivity_title_dialog_choosepath) )
 
         val fileList = PathTraceService.getPastPathFilesList(dir)
 
@@ -395,7 +395,7 @@ class RunningActivity : BaseActivity() {
             val dialog = builder.create()
             dialog.show()
         } else {
-            showToast("No previous paths to show")
+            showToast(getResourceString(R.string.runningactivity_toast_no_past_path_found) )
         }
     }
 
