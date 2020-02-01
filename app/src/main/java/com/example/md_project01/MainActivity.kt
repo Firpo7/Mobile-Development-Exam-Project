@@ -41,6 +41,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        if (BuildConfig.DEBUG) findViewById<Button>(R.id.mainactivity_populate_stat_db).visibility = View.VISIBLE
         addLocationListener {
             if(isLocationEnabled()){
                 showToast("Location enabled")
@@ -297,10 +298,11 @@ class MainActivity : BaseActivity() {
     }
 
     fun insertRandomValuesInDB(@Suppress("UNUSED_PARAMETER") v: View) {
-        for (i in 0..365) {
-            val date = System.currentTimeMillis() - DAYS_1 * i
-            MyInsertTask(this@MainActivity, Stats(Date(date), abs(Random.nextLong()%1000))).execute()
-        }
+        if (BuildConfig.DEBUG)
+            for (i in 0..365) {
+                val date = System.currentTimeMillis() - DAYS_1 * i
+                MyInsertTask(this@MainActivity, Stats(Date(date), abs(Random.nextLong()%1000))).execute()
+            }
     }
 
     private fun setDaysToShow(value: Long) {
