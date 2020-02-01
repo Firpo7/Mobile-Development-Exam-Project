@@ -12,6 +12,9 @@
     <string name="mainactivity_textview_run_suggestion_good">TODAY IS A GOOD DAY!!</string>
     <string name="mainactivity_textview_run_suggestion_bad">MAYBE NOT TODAY..</string>
     <string name="mainactivity_textview_your_stats">Here is your stats!!</string>
+    <string name="mainactivity_textview_last_week">Last Week</string>
+    <string name="mainactivity_textview_last_month">Last Month</string>
+    <string name="mainactivity_textview_last_year">Last Year</string>
 
     <string name="day_monday">Mon</string>
     <string name="day_tuesday">Tue</string>

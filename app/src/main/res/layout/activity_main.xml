@@ -206,11 +206,12 @@
         app:layout_constraintVertical_bias="0.383" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/mainactivity_populate_stat_db"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="insertRandomValuesInDB"
         android:text="add test"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/startRunning"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -221,7 +222,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:onClick="set7Days"
-        android:text="last week"
+        android:text="@string/mainactivity_textview_last_week"
         android:textColor="@android:color/holo_green_dark"
         app:layout_constraintBaseline_toBaselineOf="@+id/button4"
         app:layout_constraintEnd_toStartOf="@+id/button4" />
@@ -233,7 +234,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:onClick="set30Days"
-        android:text="last month"
+        android:text="@string/mainactivity_textview_last_month"
         android:textColor="@android:color/holo_green_dark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -246,7 +247,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:onClick="set365Days"
-        android:text="last year"
+        android:text="@string/mainactivity_textview_last_year"
         android:textColor="@android:color/holo_green_dark"
         app:layout_constraintBaseline_toBaselineOf="@+id/button4"
         app:layout_constraintStart_toEndOf="@+id/button4" />
