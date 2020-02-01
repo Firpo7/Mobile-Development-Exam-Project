@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MD-project01</string>
+    <string name="app_name">MoDe Run!</string>
 
     <string name="runningactivity_textview_distance"> Distance: </string>
     <string name="runningactivity_button_start">START</string>
