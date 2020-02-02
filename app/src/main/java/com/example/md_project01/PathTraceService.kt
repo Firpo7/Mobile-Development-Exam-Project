@@ -1,6 +1,6 @@
 package com.example.md_project01
 
-import android.R
+//import android.R
 import android.app.*
 import android.content.Intent
 import android.location.Location
@@ -16,7 +16,7 @@ import java.util.*
 
 
 class PathTraceService : Service() {
-    val CHANNEL_ID = "PathTraceServiceChannel"
+    private val CHANNEL_ID = "PathTraceServiceChannel"
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var locationRequest = LocationRequest()
     var locationCallback = object : LocationCallback() {
@@ -36,15 +36,14 @@ class PathTraceService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
+            Log.d("[PathTraceService]", "createNotificationChannel")
+            val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Foreground PathTraceService Channel",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
-            val manager = getSystemService(
-                NotificationManager::class.java
-            )
-            manager!!.createNotificationChannel(serviceChannel)
+            val manager = getSystemService(NotificationManager::class.java)
+            manager!!.createNotificationChannel(channel)
         }
     }
 
@@ -69,14 +68,14 @@ class PathTraceService : Service() {
             Looper.myLooper()
         )
 
-        val pendingIntent = PendingIntent.getActivity(this,0, Intent(this, RunningActivity::class.java), 0)
-        val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Foreground Service")
-            .setContentText("ajeje")
-            //.setSmallIcon(R.drawable.ic_stat_name)
+        val pendingIntent = PendingIntent.getActivity(this,0, Intent(this, RunningActivity::class.java),  PendingIntent.FLAG_UPDATE_CURRENT)
+        val notification: Notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setContentTitle("You are running!")
+            .setContentText("Tap here to open the app")
+            .setSmallIcon(R.drawable.notification_icon)
             .setContentIntent(pendingIntent)
             .build()
-        startForeground(1, notification)
+        startForeground(2020, notification)
 
         return super.onStartCommand(intent, flags, startId)
     }

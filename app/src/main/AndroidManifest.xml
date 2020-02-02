@@ -35,7 +35,8 @@
             android:label="Run!!"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme"
