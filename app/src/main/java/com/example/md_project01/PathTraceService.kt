@@ -149,7 +149,7 @@ class PathTraceService : Service() {
                     } catch (e: NumberFormatException) {
                         false
                     }
-                }
+                }?.sorted()
             }
 
             return null
