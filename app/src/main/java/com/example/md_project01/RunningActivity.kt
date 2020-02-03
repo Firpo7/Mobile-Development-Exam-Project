@@ -344,7 +344,6 @@ class RunningActivity : BaseActivity() {
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->
                 val timestamp = fileList[i].name.split(".")[0].toLong()
-                val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
                 sdf.format(Date(timestamp))
             }
 
@@ -380,9 +379,7 @@ class RunningActivity : BaseActivity() {
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = Array(fileList.size) { i ->
                 val timestamp = fileList[i].name.split(".")[0].toLong()
-                val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
                 sdf.format(Date(timestamp))
-                fileList[i].name
             }
 
             builder.setItems(fileNames) { _, which ->
@@ -413,6 +410,7 @@ class RunningActivity : BaseActivity() {
 //        private const val UPDATE_INTERVAL_MS: Long = 1000
 //        private const val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
         private const val GCS_WGS84 = 4326 // Geographic coordinate systems returned from a GPS device
+        private val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
 
         private enum class ButtonState {START, STOP}
     }
