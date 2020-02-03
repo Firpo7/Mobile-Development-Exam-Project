@@ -101,7 +101,7 @@ open class BaseActivity : AppCompatActivity() {
             }
             else {
                 //TODO: show something better?
-                showToast("Enable location to see weather and position")
+                showToast( getResourceString(R.string.error_location_disabled) )
             }
         } else {
             requestPermissions(REQUEST_PERMISSION_LOCATION_ID)
@@ -132,6 +132,10 @@ open class BaseActivity : AppCompatActivity() {
     protected fun setTextView(textView: TextView, text: String?) {
         if ( text != null )
             textView.text = text
+    }
+
+    protected fun getResourceString(i: Int): String {
+        return resources.getString(i)
     }
 
     fun showToast(msg: String?) {

@@ -41,6 +41,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        if (BuildConfig.DEBUG) findViewById<Button>(R.id.mainactivity_populate_stat_db).visibility = View.VISIBLE
         addLocationListener {
             if(isLocationEnabled()){
                 showToast("Location enabled")
@@ -108,7 +109,7 @@ class MainActivity : BaseActivity() {
         mChart = findViewById(R.id.mainactivity_barchart_statistics)
         //mChart.setBackgroundColor(Color.WHITE)
         val d = Description()
-        d.text = "No data found"
+        d.text = getResourceString(R.string.no_chart_data_found)
         mChart.description = d
         mChart.description.isEnabled = false
         mChart.legend.isEnabled = false
@@ -138,16 +139,16 @@ class MainActivity : BaseActivity() {
     }
 
     private fun getDayName(i: Int): String {
-        return when(i) {
-            1 -> "Sun"
-            2 -> "Mon"
-            3 -> "Tue"
-            4 -> "Wed"
-            5 -> "Thu"
-            6 -> "Fri"
-            7 -> "Sat"
-            else -> "Err"
-        }
+        return getResourceString(when(i) {
+            1 -> R.string.day_sunday
+            2 -> R.string.day_monday
+            3 -> R.string.day_tuesday
+            4 -> R.string.day_wednesday
+            5 -> R.string.day_thursday
+            6 -> R.string.day_friday
+            7 -> R.string.day_saturday
+            else -> R.string.day_error
+        })
     }
 
     private fun Context.resIdByName(resIdName: String?, resType: String): Int {
@@ -297,10 +298,11 @@ class MainActivity : BaseActivity() {
     }
 
     fun insertRandomValuesInDB(@Suppress("UNUSED_PARAMETER") v: View) {
-        for (i in 0..365) {
-            val date = System.currentTimeMillis() - DAYS_1 * i
-            MyInsertTask(this@MainActivity, Stats(Date(date), abs(Random.nextLong()%1000))).execute()
-        }
+        if (BuildConfig.DEBUG)
+            for (i in 0..365) {
+                val date = System.currentTimeMillis() - DAYS_1 * i
+                MyInsertTask(this@MainActivity, Stats(Date(date), abs(Random.nextLong()%1000))).execute()
+            }
     }
 
     private fun setDaysToShow(value: Long) {
