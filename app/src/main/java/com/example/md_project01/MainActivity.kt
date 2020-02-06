@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
@@ -94,7 +95,10 @@ class MainActivity : BaseActivity() {
         }
 
         val barYSet = BarDataSet(valuesYList, "m")
-        barYSet.color = Color.RED
+        barYSet.color = if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M )
+                            resources.getColor(R.color.color_dark_orange, theme)
+                        else
+                            resources.getColor(R.color.color_dark_orange)
         
         val data = BarData(barYSet)
         mChart.xAxis.valueFormatter = IndexAxisValueFormatter(barEntryLabels)
