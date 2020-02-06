@@ -16,139 +16,181 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/day0"
             android:layout_width="60dp"
-            android:layout_height="60dp">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/weekday_0"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/forecastday_0"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/weekday_0"
                 tools:srcCompat="@drawable/sunny_day" />
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/day1"
             android:layout_width="60dp"
-            android:layout_height="60dp">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/weekday_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAlignment="center"/>
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/forecastday_1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weekday_1"
                 tools:srcCompat="@drawable/sunny_day" />
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/day2"
             android:layout_width="60dp"
-            android:layout_height="60dp">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/weekday_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAlignment="center"/>
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/forecastday_2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weekday_2"
                 tools:srcCompat="@drawable/sunny_day" />
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/day3"
             android:layout_width="60dp"
-            android:layout_height="60dp">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/weekday_3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAlignment="center"/>
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/forecastday_3"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weekday_3"
                 tools:srcCompat="@drawable/sunny_day" />
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/day4"
-            android:layout_width="58dp"
-            android:layout_height="60dp">
+            android:layout_width="60dp"
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/weekday_4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAlignment="center"/>
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/forecastday_4"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weekday_4"
                 tools:srcCompat="@drawable/sunny_day" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </FrameLayout>
-
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/day5"
-            android:layout_width="59dp"
-            android:layout_height="60dp">
+            android:layout_width="60dp"
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/weekday_5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAlignment="center"/>
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/forecastday_5"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weekday_5"
                 tools:srcCompat="@drawable/sunny_day" />
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/day6"
-            android:layout_width="59dp"
-            android:layout_height="60dp">
+            android:layout_width="60dp"
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/weekday_6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/forecastday_6"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weekday_6"
                 tools:srcCompat="@drawable/sunny_day" />
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 
@@ -172,9 +214,8 @@
         android:id="@+id/mainactivity_textview_run_suggestion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginTop="32dp"
         android:textSize="24sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
@@ -192,27 +233,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.146" />
+
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/mainactivity_barchart_statistics"
         android:layout_width="0dp"
-        android:layout_height="230dp"
+        android:layout_height="0dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toTopOf="@+id/startRunning"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainactivity_textview_run_suggestion"
-        app:layout_constraintVertical_bias="0.383" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
         android:id="@+id/mainactivity_populate_stat_db"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:onClick="insertRandomValuesInDB"
         android:text="add test"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/startRunning"
+        app:layout_constraintBottom_toTopOf="@+id/mainactivity_barchart_statistics"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -256,11 +300,12 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
         android:text="@string/mainactivity_textview_your_stats"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/mainactivity_barchart_statistics"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mainactivity_textview_run_suggestion" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

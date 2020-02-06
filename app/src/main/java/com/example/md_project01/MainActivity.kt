@@ -7,15 +7,14 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
 import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
@@ -35,7 +34,7 @@ class MainActivity : BaseActivity() {
     private var isForecastInit = false
     private val DAY_LAYOUTS: IntArray = intArrayOf(R.id.day0,R.id.day1,R.id.day2,R.id.day3,R.id.day4,R.id.day5,R.id.day6)
     private lateinit var mChart: BarChart
-    private var DAYS_TO_SHOW: Long = 7
+    private var DAYS_TO_SHOW: Long = 7L
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +54,7 @@ class MainActivity : BaseActivity() {
         updateForecast()
 
         sharedPreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        DAYS_TO_SHOW = sharedPreferences.getLong(PREF_DAYS_TO_SHOW, 7L)
+        DAYS_TO_SHOW = sharedPreferences.getLong(PREF_DAYS_TO_SHOW, DAYS_TO_SHOW)
 
         initializeChart()
         updateForecast()
@@ -170,7 +169,7 @@ class MainActivity : BaseActivity() {
         Log.d("[setImageViews]", "STARTING CYCLING RESULTS")
         for ( i in 0 until results.size) {
             setImageView(
-                findViewById<FrameLayout>(DAY_LAYOUTS[i]).getChildAt(1) as ImageView,
+                findViewById<ConstraintLayout>(DAY_LAYOUTS[i]).getChildAt(1) as ImageView,
                 results[i]
             )
         }
@@ -259,12 +258,10 @@ class MainActivity : BaseActivity() {
             val currDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1
 
             for (i in DAY_LAYOUTS.indices) {
-                val currFrame = findViewById<FrameLayout>(DAY_LAYOUTS[i])
+                val currConstraintLayout = findViewById<ConstraintLayout>(DAY_LAYOUTS[i])
+                currConstraintLayout.layoutParams.width = frameWidth
 
-                currFrame.layoutParams.width = frameWidth
-                currFrame.layoutParams.height = frameWidth + 25.px
-
-                (currFrame.getChildAt(0) as TextView).text = getDayName( ( (currDayOfWeek + i) % 7 ) + 1 )
+                (currConstraintLayout.getChildAt(0) as TextView).text = getDayName( ( (currDayOfWeek + i) % 7 ) + 1 )
             }
             isForecastInit = true
         }
