@@ -54,6 +54,7 @@ class RunningActivity : BaseActivity() {
     private var pathTrace: Intent? = null
     private lateinit var locationListener: BroadcastReceiver// = LocationReceiver(this)
     private var distanceMade = 0.0
+    private var wasRunning: Boolean = false
 
 
     //@Volatile
@@ -99,11 +100,24 @@ class RunningActivity : BaseActivity() {
         unregisterReceiver(locationListener)
         mapView.pause()
     }
+
     override fun onResume() {
         super.onResume()
         registerReceiver(locationListener, IntentFilter(PathTraceService.NOTIFY))
+        if (wasRunning) {
+            wasRunning = false
+            locationDisplay.startAsync()
+        }
         mapView.resume()
     }
+    override fun onStop() {
+        super.onStop()
+        if (locationDisplay.isStarted) {
+            wasRunning = true
+            locationDisplay.stop()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         mapView.dispose()
