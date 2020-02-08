@@ -36,7 +36,6 @@ class PathTraceService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.d("[PathTraceService]", "createNotificationChannel")
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Foreground PathTraceService Channel",
@@ -50,7 +49,6 @@ class PathTraceService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("[PathTraceService]", "create")
         createNotificationChannel()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationRequest.interval = 1000
@@ -82,7 +80,6 @@ class PathTraceService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("[PathTraceService]", "Destroy!")
         fusedLocationClient.removeLocationUpdates(locationCallback)
         save()
         //ps.d_save() //DEBUG
@@ -93,12 +90,10 @@ class PathTraceService : Service() {
     }
 
     private fun updateTrace(loc: Location?){
-        Log.d("[PathTraceService]","updateTrace(${loc!=null})")
         if(loc != null){
             val newDistance = addNewPoint(loc)
 
             if(newDistance != null){ //notify to running activity
-                Log.d("[PathTraceService]","sendBroadcast! (dist=$newDistance)")
                 val intent = Intent(NOTIFY)
                 intent.putExtra(EXTRA_DISTANCE, newDistance)
                 sendBroadcast(intent)
@@ -107,11 +102,8 @@ class PathTraceService : Service() {
     }
 
     private fun addNewPoint(location: Location): Double? {
-        Log.d("[PathTraceService]", "coord=${location.latitude},${location.longitude}")
         val midp = buffer.add(Point(location.latitude, location.longitude))
         if(midp != null){
-            Log.d("[PathTraceService]", "ADD! coord=${midp.lat},${midp.lon}")
-
             latitudes.add(midp.lat)
             longitudes.add(midp.lon)
 
@@ -130,7 +122,6 @@ class PathTraceService : Service() {
         //save() and addPoint() are thread safe?
 
         val filename = "$timestamp.json"
-        Log.d("[PathService]", "$dir/$filename")
         return if (checkDir(dir)) {
             // directory exists or already created
             val dest = File(dir, filename)
@@ -140,7 +131,6 @@ class PathTraceService : Service() {
                 true
             } catch (e: Exception) {
                 // handle the exception
-                Log.d("Write File Failed", e.message.toString())
                 false
             }
 

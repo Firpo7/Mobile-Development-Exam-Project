@@ -27,6 +27,7 @@ open class BaseActivity : AppCompatActivity() {
 
     lateinit var fusedLocationClient: FusedLocationProviderClient
     lateinit var broadcastRec: BroadcastReceiver
+    protected var LOG_TAG = "BaseActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -164,7 +165,6 @@ open class BaseActivity : AppCompatActivity() {
 
         override fun doInBackground(vararg voids: Void?): List<Stats>? {
             db ?: return null
-            Log.d("[MyRetrieveTask]", "retrieving from: $from")
             return db!!.statDao().getLastNDays(from)
         }
 

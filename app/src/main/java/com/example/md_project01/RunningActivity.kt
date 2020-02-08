@@ -8,7 +8,6 @@ import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.os.Environment
-import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -28,9 +27,6 @@ import com.esri.arcgisruntime.mapping.view.LocationDisplay
 import com.esri.arcgisruntime.mapping.view.WrapAroundMode
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import kotlinx.android.synthetic.main.content_running.*
 import org.json.JSONObject
 import java.io.File
@@ -66,6 +62,9 @@ class RunningActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_running)
+        super.LOG_TAG = "RunningActivity"
+        Log.d("[$LOG_TAG]", "onCreate()")
+
         dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
 
         val toolbar: Toolbar  = findViewById(R.id.toolbar)
@@ -97,12 +96,14 @@ class RunningActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
+        Log.d("[$LOG_TAG]", "onPause()")
         unregisterReceiver(locationListener)
         mapView.pause()
     }
 
     override fun onResume() {
         super.onResume()
+        Log.d("[$LOG_TAG]", "onResume()")
         registerReceiver(locationListener, IntentFilter(PathTraceService.NOTIFY))
         if (wasRunning) {
             wasRunning = false
@@ -110,8 +111,10 @@ class RunningActivity : BaseActivity() {
         }
         mapView.resume()
     }
+
     override fun onStop() {
         super.onStop()
+        Log.d("[$LOG_TAG]", "onStop()")
         if (locationDisplay.isStarted) {
             wasRunning = true
             locationDisplay.stop()
@@ -120,6 +123,7 @@ class RunningActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("[$LOG_TAG]", "onDestroy()")
         mapView.dispose()
         shutdownScheduledTask()
     }
@@ -146,7 +150,6 @@ class RunningActivity : BaseActivity() {
 
     private fun shutdownScheduledTask() {
         //fusedLocationClient.removeLocationUpdates(this.locationCallback)
-        Log.d("shutdownScheduledTask","shutdownScheduledTask")
         MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), distanceMade.toLong())).execute()
         if(pathTrace != null) stopService(pathTrace)
     }
@@ -235,7 +238,6 @@ class RunningActivity : BaseActivity() {
 
 
     private fun updateDistance(distance: Double){
-        Log.d("[RunningActivity]", "updateDistance($distance)")
         distanceMade = distance
         setTextView(
             findViewById(R.id.runningactivity_textview_distance),
@@ -413,7 +415,6 @@ class RunningActivity : BaseActivity() {
     class LocationReceiver(private val ra: RunningActivity) : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val dist = intent.getDoubleExtra(PathTraceService.EXTRA_DISTANCE, 0.0)
-            Log.d("[LocationReceiver]", "dist=$dist")
             if(dist>0) ra.updateDistance(dist)
         }
     }

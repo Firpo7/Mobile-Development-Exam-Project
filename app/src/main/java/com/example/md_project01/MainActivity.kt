@@ -41,6 +41,8 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        super.LOG_TAG = "MainActivity"
         if (BuildConfig.DEBUG) findViewById<Button>(R.id.mainactivity_populate_stat_db).visibility = View.VISIBLE
         addLocationListener {
             if(isLocationEnabled()){
@@ -161,15 +163,12 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setImageView(view: ImageView, forecast: String) {
-        Log.d("[setImageView]", "code: $forecast")
         val id = applicationContext.resIdByName(forecast, "drawable")
-        Log.d("[setImageView]", "id: $id")
 
         view.setImageResource(id)
     }
 
     private fun setImageViews(results: ArrayList<String>) {
-        Log.d("[setImageViews]", "STARTING CYCLING RESULTS")
         for ( i in 0 until results.size) {
             setImageView(
                 findViewById<ConstraintLayout>(DAY_LAYOUTS[i]).getChildAt(1) as ImageView,
@@ -215,11 +214,9 @@ class MainActivity : BaseActivity() {
             }
 
             if ( forecast.isNotEmpty() ) {
-                Log.d("[MainActivity]", "Loading forecasts from sharedPreferences")
                 setImageViews(forecast)
                 setSuggestionTextView(forecast[0])
             } else {
-                Log.d("[MainActivity]", "Loading forecasts from API")
                 QueryWeatherService.doForecast(
                     location.latitude,
                     location.longitude
