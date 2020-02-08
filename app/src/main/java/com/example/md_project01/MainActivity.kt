@@ -52,13 +52,12 @@ class MainActivity : BaseActivity() {
                 showToast("Location disabled")
             }
         }
-        updateForecast()
 
         sharedPreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         DAYS_TO_SHOW = sharedPreferences.getLong(PREF_DAYS_TO_SHOW, DAYS_TO_SHOW)
 
-        initializeChart()
         updateForecast()
+        initializeChart()
     }
 
     override fun onStart() {
@@ -99,7 +98,7 @@ class MainActivity : BaseActivity() {
                             resources.getColor(R.color.color_dark_orange, theme)
                         else
                             resources.getColor(R.color.color_dark_orange)
-        
+
         val data = BarData(barYSet)
         mChart.xAxis.valueFormatter = IndexAxisValueFormatter(barEntryLabels)
         mChart.data = data
@@ -142,7 +141,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun getDayName(i: Int): String {
-        return getResourceString(when(i) {
+        return getResourceString( when(i) {
             1 -> R.string.day_sunday
             2 -> R.string.day_monday
             3 -> R.string.day_tuesday

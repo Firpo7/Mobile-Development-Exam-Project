@@ -27,6 +27,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textAlignment="center"
+                android:textColor="@color/color_dark_teal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -52,6 +53,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textAlignment="center"
+                android:textColor="@color/color_dark_teal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -77,6 +79,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textAlignment="center"
+                android:textColor="@color/color_dark_teal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -102,6 +105,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textAlignment="center"
+                android:textColor="@color/color_dark_teal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -127,6 +131,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textAlignment="center"
+                android:textColor="@color/color_dark_teal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -152,6 +157,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textAlignment="center"
+                android:textColor="@color/color_dark_teal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -177,6 +183,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textAlignment="center"
+                android:textColor="@color/color_dark_teal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -214,6 +221,7 @@
         android:id="@+id/mainactivity_textview_run_suggestion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/color_dark_teal"
         android:textSize="24sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -224,9 +232,9 @@
         android:id="@+id/reload_forecast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="updateForecast"
         android:text="grant permission to see forecast"
         android:visibility="gone"
-        android:onClick="updateForecast"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -239,14 +247,14 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toTopOf="@+id/startRunning"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/mainactivity_textview_run_suggestion" />
 
     <Button
         android:id="@+id/mainactivity_populate_stat_db"
@@ -267,7 +275,7 @@
         android:layout_marginEnd="32dp"
         android:onClick="set7Days"
         android:text="@string/mainactivity_textview_last_week"
-        android:textColor="@android:color/holo_green_dark"
+        android:textColor="@color/color_teal"
         app:layout_constraintBaseline_toBaselineOf="@+id/button4"
         app:layout_constraintEnd_toStartOf="@+id/button4" />
 
@@ -279,7 +287,7 @@
         android:layout_marginTop="24dp"
         android:onClick="set30Days"
         android:text="@string/mainactivity_textview_last_month"
-        android:textColor="@android:color/holo_green_dark"
+        android:textColor="@color/color_teal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mainactivity_barchart_statistics" />
@@ -292,20 +300,8 @@
         android:layout_marginStart="32dp"
         android:onClick="set365Days"
         android:text="@string/mainactivity_textview_last_year"
-        android:textColor="@android:color/holo_green_dark"
+        android:textColor="@color/color_teal"
         app:layout_constraintBaseline_toBaselineOf="@+id/button4"
         app:layout_constraintStart_toEndOf="@+id/button4" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/mainactivity_textview_your_stats"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainactivity_textview_run_suggestion" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
