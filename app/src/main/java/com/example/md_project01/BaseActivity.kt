@@ -31,17 +31,20 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(LOG_TAG,"onCreate()")
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     override fun onResume() {
         super.onResume()
+        Log.d(LOG_TAG,"onResume()")
         if(::broadcastRec.isInitialized)
             registerReceiver(broadcastRec, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
     }
 
     override fun onPause() {
         super.onPause()
+        Log.d(LOG_TAG,"onPause()")
         if(::broadcastRec.isInitialized)
             unregisterReceiver(broadcastRec)
     }
