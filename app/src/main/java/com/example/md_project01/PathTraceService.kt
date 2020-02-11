@@ -145,9 +145,9 @@ class PathTraceService : Service() {
     }
 
     companion object{
-        val NOTIFY = "notify"
-        val EXTRA_DIR = "dir"
-        val EXTRA_DISTANCE = "distance"
+        const val NOTIFY = "notify"
+        const val EXTRA_DIR = "dir"
+        const val EXTRA_DISTANCE = "distance"
 
 
         fun getPastPathFilesList(dir: String): List<File>? {

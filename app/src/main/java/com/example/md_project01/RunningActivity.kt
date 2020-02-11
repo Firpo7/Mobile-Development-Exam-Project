@@ -36,28 +36,19 @@ import java.util.concurrent.locks.ReentrantLock
 
 
 class RunningActivity : BaseActivity() {
-    private var dir: String = ""// = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
-//    private var lastLocation: Location? = null
-
+    private var dir: String = ""
     private lateinit var locationDisplay: LocationDisplay
-
-//    private var locationCallback: LocationCallback? = null
-//    private lateinit var locationRequest: LocationRequest
     private lateinit var graphicsOverlay: GraphicsOverlay
     private var lastLineGraphic: Graphic? = null
     private var lastStartPointGraphic: Graphic? = null
     private var lastEndPointGraphic: Graphic? = null
     private var pathTrace: Intent? = null
-    private lateinit var locationListener: BroadcastReceiver// = LocationReceiver(this)
+    private lateinit var locationListener: BroadcastReceiver
     private var distanceMade = 0.0
     private var wasRunning: Boolean = false
 
-
-    //@Volatile
-    //private var pathService: PathService? = null
     private val sharedCounterLock = ReentrantLock()
     private var currentButtonState: ButtonState = ButtonState.START
-    //private val locationSettingsRequest: LocationSettingsRequest? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,21 +67,6 @@ class RunningActivity : BaseActivity() {
         }
 
         locationListener = LocationReceiver(this)
-/*
-        this.locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                super.onLocationResult(locationResult) // why? this. is. retarded. Android.
-                updateDistance(locationResult.lastLocation)
-            }
-        }
-*/
-/*
-        locationRequest = LocationRequest()
-        locationRequest.interval = UPDATE_INTERVAL_MS
-        locationRequest.fastestInterval = FASTEST_UPDATE_INTERVAL_MS
-        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-*/
-
 
     }
 
@@ -149,7 +125,6 @@ class RunningActivity : BaseActivity() {
     }
 
     private fun shutdownScheduledTask() {
-        //fusedLocationClient.removeLocationUpdates(this.locationCallback)
         MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), distanceMade.toLong())).execute()
         if(pathTrace != null) stopService(pathTrace)
     }
@@ -245,28 +220,7 @@ class RunningActivity : BaseActivity() {
         )
     }
 
-/*
-    private fun updateDistance(location: Location?) {
-        if (location != null) {
-            try {
-                sharedCounterLock.lock()
-                val distanceUpdated = pathService!!.addPoint(location)
 
-                Log.d("RUNNING SCHEDULED TASK", pathService!!.distanceMade.toString())
-                if(distanceUpdated != null)
-                    setTextView(
-                        findViewById(R.id.runningactivity_textview_distance),
-                        distanceUpdated.toLong().toString()
-                    )
-                Log.d("setTextView", "OK")
-            } finally {
-                sharedCounterLock.unlock()
-            }
-        } else {
-            Log.d("RUNNING SCHEDULED TASK", "null Location!!")
-        }
-    }
-*/
     fun buttonStartStop(@Suppress("UNUSED_PARAMETER") v: View) {
         currentButtonState = when(currentButtonState) {
             ButtonState.START -> {
@@ -300,12 +254,10 @@ class RunningActivity : BaseActivity() {
 
                 locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
                 locationDisplay.startAsync()
-                /*fusedLocationClient.requestLocationUpdates(
-                    this.locationRequest,
-                    this.locationCallback,
-                    Looper.myLooper()
+                setTextView(
+                    findViewById(R.id.runningactivity_textview_distance),
+                    "0"
                 )
-                */
             }
         } else {
             //TODO: do something better
@@ -316,10 +268,8 @@ class RunningActivity : BaseActivity() {
     private fun stopRunning() {
         if(::locationDisplay.isInitialized)
             if (locationDisplay.isStarted) {
-                //saveStats()
                 shutdownScheduledTask()
                 locationDisplay.stop()
-                //savePathMade()
             }
     }
 
@@ -420,13 +370,9 @@ class RunningActivity : BaseActivity() {
     }
 
 
-
     companion object {
-//        private const val UPDATE_INTERVAL_MS: Long = 1000
-//        private const val FASTEST_UPDATE_INTERVAL_MS: Long = 1000
         private const val GCS_WGS84 = 4326 // Geographic coordinate systems returned from a GPS device
         private val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
-
         private enum class ButtonState {START, STOP}
     }
 }
