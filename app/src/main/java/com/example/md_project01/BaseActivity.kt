@@ -32,7 +32,6 @@ open class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
     }
 
     override fun onResume() {
@@ -76,8 +75,7 @@ open class BaseActivity : AppCompatActivity() {
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode ==
-            REQUEST_PERMISSION_LOCATION_ID) {
+        if (requestCode == REQUEST_PERMISSION_LOCATION_ID) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // Granted. Start getting the location information
                 return
@@ -109,7 +107,7 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
-    protected fun addLocationListener(callback: () -> Unit){
+    protected fun addLocationListener(callback: () -> Unit) {
         broadcastRec = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action!!.matches("android.location.PROVIDERS_CHANGED".toRegex()))
@@ -145,7 +143,6 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     class MyInsertTask internal constructor(context: Context, private val stat: Stats): AsyncTask<Void?, Void?, Boolean>() {
-
         //private val activityReference: WeakReference<MainActivity> = WeakReference(context)
         var db: StatDatabase? = null
 
@@ -204,7 +201,6 @@ open class BaseActivity : AppCompatActivity() {
         fun openDB(context: Context): StatDatabase? {
             return StatDatabase.getInstance(context)
         }
-
     }
 
 }
