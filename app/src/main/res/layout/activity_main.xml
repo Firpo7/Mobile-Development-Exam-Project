@@ -39,7 +39,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/weekday_0"
-                tools:srcCompat="@drawable/sunny_day" />
+                app:srcCompat="@drawable/no_forecasts_results" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,7 +65,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/weekday_1"
-                tools:srcCompat="@drawable/sunny_day" />
+                app:srcCompat="@drawable/no_forecasts_results" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -91,7 +91,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/weekday_2"
-                tools:srcCompat="@drawable/sunny_day" />
+                app:srcCompat="@drawable/no_forecasts_results" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -117,7 +117,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/weekday_3"
-                tools:srcCompat="@drawable/sunny_day" />
+                app:srcCompat="@drawable/no_forecasts_results" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -143,7 +143,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/weekday_4"
-                tools:srcCompat="@drawable/sunny_day" />
+                app:srcCompat="@drawable/no_forecasts_results" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -169,7 +169,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/weekday_5"
-                tools:srcCompat="@drawable/sunny_day" />
+                app:srcCompat="@drawable/no_forecasts_results" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -196,7 +196,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/weekday_6"
-                tools:srcCompat="@drawable/sunny_day" />
+                app:srcCompat="@drawable/no_forecasts_results" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>

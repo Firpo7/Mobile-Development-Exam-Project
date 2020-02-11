@@ -93,20 +93,22 @@ open class BaseActivity : AppCompatActivity() {
         )
     }
 
-    protected fun getLocationWithCallback(callback: ( location: Location? ) -> Unit) {
-        if (checkPermissions(REQUEST_PERMISSION_LOCATION_ID)) {
+    protected fun getLocationWithCallback(callback: ( location: Location? ) -> Unit) : Boolean {
+        return if (checkPermissions(REQUEST_PERMISSION_LOCATION_ID)) {
             if (isLocationEnabled()) {
                 fusedLocationClient.lastLocation
                     .addOnSuccessListener { location: Location? ->
                         callback(location)
                     }
-            }
-            else {
+                true
+            } else {
                 //TODO: show something better?
                 showToast( getResourceString(R.string.error_location_disabled) )
+                false
             }
         } else {
             requestPermissions(REQUEST_PERMISSION_LOCATION_ID)
+            false
         }
     }
 
@@ -147,7 +149,7 @@ open class BaseActivity : AppCompatActivity() {
 
     class MyInsertTask internal constructor(context: Context, private val stat: Stats): AsyncTask<Void?, Void?, Boolean>() {
         //private val activityReference: WeakReference<MainActivity> = WeakReference(context)
-        var db: StatDatabase? = null
+        var db: StatDatabase? = openDB(context)
 
         override fun doInBackground(vararg objs: Void?): Boolean {
             db ?: return false
@@ -155,17 +157,13 @@ open class BaseActivity : AppCompatActivity() {
             return true
         }
 
-        init {
-            db = openDB(context)
-        }
     }
 
     class MyRetrieveTask internal constructor(context: Context, private val from: Date, private val callback: (stats: List<Stats> ) -> Unit): AsyncTask<Void?, Void?, List<Stats>?>() {
-        var db: StatDatabase? = null
+        var db: StatDatabase? = openDB(context)
 
         override fun doInBackground(vararg voids: Void?): List<Stats>? {
-            db ?: return null
-            return db!!.statDao().getLastNDays(from)
+            return db?.statDao()?.getLastNDays(from)
         }
 
         override fun onPostExecute(stats: List<Stats>?) {
@@ -174,10 +172,6 @@ open class BaseActivity : AppCompatActivity() {
             } else {
                 Log.d("MyRetrieveTask #####", "Error while retrieving datas in DB")
             }
-        }
-
-        init {
-            db = openDB(context)
         }
 
     }

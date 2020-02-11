@@ -28,8 +28,7 @@ abstract class StatDatabase : RoomDatabase() {
                 context,
                 StatDatabase::class.java,
                 DB_NAME
-            )
-                .allowMainThreadQueries().build()
+            ).allowMainThreadQueries().build()
         }
     }
 }
