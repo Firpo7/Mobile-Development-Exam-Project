@@ -110,18 +110,17 @@ class RunningActivity : BaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_show_path_histories) {
-            showPathHistories()
-            return true
+        return when(item.itemId){
+            R.id.action_show_path_histories -> {
+                showPathHistories()
+                true
+            }
+            R.id.action_delete_some_paths -> {
+                deleteSavedPath()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-
-        if (id == R.id.action_delete_some_paths) {
-            deleteSavedPath()
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     private fun shutdownScheduledTask() {
@@ -224,11 +223,14 @@ class RunningActivity : BaseActivity() {
     fun buttonStartStop(@Suppress("UNUSED_PARAMETER") v: View) {
         currentButtonState = when(currentButtonState) {
             ButtonState.START -> {
-                val button = findViewById<Button>(R.id.runningactivity_button_start)
-                button.text = resources.getText(R.string.runningactivity_button_stop)
-                button.setBackgroundResource(R.color.color_dark_orange)
-                startRunning()
-                ButtonState.STOP
+                if (isLocationEnabled()) {
+                    val button = findViewById<Button>(R.id.runningactivity_button_start)
+                    button.text = resources.getText(R.string.runningactivity_button_stop)
+                    button.setBackgroundResource(R.color.color_dark_orange)
+                    startRunning()
+                    ButtonState.STOP
+                }
+                else ButtonState.START
             }
             ButtonState.STOP -> {
                 stopRunning()
@@ -266,11 +268,10 @@ class RunningActivity : BaseActivity() {
     }
 
     private fun stopRunning() {
-        if(::locationDisplay.isInitialized)
-            if (locationDisplay.isStarted) {
-                shutdownScheduledTask()
-                locationDisplay.stop()
-            }
+        if (::locationDisplay.isInitialized && locationDisplay.isStarted) {
+            shutdownScheduledTask()
+            locationDisplay.stop()
+        }
     }
 
 
