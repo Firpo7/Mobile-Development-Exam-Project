@@ -91,7 +91,7 @@ class RunningActivity : BaseActivity() {
     override fun onStop() {
         super.onStop()
         Log.d("[$LOG_TAG]", "onStop()")
-        if (locationDisplay.isStarted) {
+        if (::locationDisplay.isInitialized && locationDisplay.isStarted) {
             wasRunning = true
             locationDisplay.stop()
         }

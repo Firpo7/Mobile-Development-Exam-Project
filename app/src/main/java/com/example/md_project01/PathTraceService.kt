@@ -5,6 +5,7 @@ import android.app.*
 import android.content.Intent
 import android.location.Location
 import android.os.Build
+import android.os.Environment
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
@@ -82,7 +83,6 @@ class PathTraceService : Service() {
         super.onDestroy()
         fusedLocationClient.removeLocationUpdates(locationCallback)
         save()
-        //ps.d_save() //DEBUG
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -118,8 +118,12 @@ class PathTraceService : Service() {
 
 
     private fun save(): Boolean {
-        if (timestamp == 0L || latitudes.isEmpty() || longitudes.isEmpty()) return false
-        //save() and addPoint() are thread safe?
+        if (timestamp == 0L ||
+            latitudes.isEmpty() ||
+            longitudes.isEmpty() ||
+            Environment.getExternalStorageState() != Environment.MEDIA_MOUNTED
+        ) return false
+
 
         val filename = "$timestamp.json"
         return if (checkDir(dir)) {
