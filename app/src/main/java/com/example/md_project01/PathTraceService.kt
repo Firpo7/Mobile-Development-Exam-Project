@@ -20,7 +20,7 @@ class PathTraceService : Service() {
     private val CHANNEL_ID = "PathTraceServiceChannel"
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var locationRequest = LocationRequest()
-    var locationCallback = object : LocationCallback() {
+    private var locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult) // why? this. is. retarded. Android.
             updateTrace(locationResult.lastLocation)
@@ -201,7 +201,7 @@ class PositionBuffer(private val bufSize: Int, private val flushDim: Int){
         return null
     }
 
-    fun midPoint(): Point {
+    private fun midPoint(): Point {
         val p = Point(0.0,0.0)
 
         for(x in buffer){
@@ -213,7 +213,7 @@ class PositionBuffer(private val bufSize: Int, private val flushDim: Int){
         return p
     }
 
-    fun flush(n: Int){
+    private fun flush(n: Int){
         if(buffer.size >= n) {
             for (i in 0 until n - 1)
                 buffer.removeFirst()

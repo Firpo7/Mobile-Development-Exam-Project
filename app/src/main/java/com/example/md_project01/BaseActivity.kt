@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.location.Location
 import android.location.LocationManager
 import android.os.AsyncTask
@@ -103,7 +102,7 @@ open class BaseActivity : AppCompatActivity() {
                 true
             } else {
                 //TODO: show something better?
-                showToast( getResourceString(R.string.error_location_disabled) )
+                showToastErrorLocationDisabled()
                 false
             }
         } else {
@@ -145,6 +144,10 @@ open class BaseActivity : AppCompatActivity() {
     fun showToast(msg: String?) {
         if (msg != null && msg.isNotEmpty())
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    fun showToastErrorLocationDisabled() {
+        showToast(getResourceString(R.string.error_location_disabled))
     }
 
     class MyInsertTask internal constructor(context: Context, private val stat: Stats): AsyncTask<Void?, Void?, Boolean>() {
@@ -191,9 +194,6 @@ open class BaseActivity : AppCompatActivity() {
         const val DAYS_1 = 1000L * 60 * 60 * 24//  day in milliseconds
 
         val sdf_statDB = SimpleDateFormat("dd-MM-yyyy", Locale.US)
-
-        val Int.dp: Int get() = (this / Resources.getSystem().displayMetrics.density).toInt()
-        val Int.px: Int get() = (this * Resources.getSystem().displayMetrics.density).toInt()
 
         fun openDB(context: Context): StatDatabase? {
             return StatDatabase.getInstance(context)

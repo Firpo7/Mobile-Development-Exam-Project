@@ -135,7 +135,7 @@ class RunningActivity : BaseActivity() {
             lat = location.latitude
             lon = location.longitude
         } else {
-            showToast( getResourceString(R.string.error_location_disabled) )
+            showToastErrorLocationDisabled()
         }
         val map = ArcGISMap(Basemap.Type.DARK_GRAY_CANVAS_VECTOR, lat, lon, 18)
         mapView.map = map
@@ -229,8 +229,10 @@ class RunningActivity : BaseActivity() {
                     button.setBackgroundResource(R.color.color_dark_orange)
                     startRunning()
                     ButtonState.STOP
+                } else {
+                    showToastErrorLocationDisabled()
+                    ButtonState.START
                 }
-                else ButtonState.START
             }
             ButtonState.STOP -> {
                 stopRunning()
@@ -263,7 +265,7 @@ class RunningActivity : BaseActivity() {
             }
         } else {
             //TODO: do something better
-            showToast( getResourceString(R.string.error_location_disabled) )
+            showToastErrorLocationDisabled()
         }
     }
 

@@ -5,17 +5,17 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import android.graphics.Color
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
@@ -29,7 +29,6 @@ import kotlin.math.abs
 import kotlin.random.Random
 
 
-
 class MainActivity : BaseActivity() {
 
     private var isForecastInit = false
@@ -41,9 +40,10 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         super.LOG_TAG = "MainActivity"
+
         if (BuildConfig.DEBUG) findViewById<Button>(R.id.mainactivity_populate_stat_db).visibility = View.VISIBLE
+
         addLocationListener {
             if(isLocationEnabled()){
                 showToast("Location enabled")
@@ -53,6 +53,19 @@ class MainActivity : BaseActivity() {
                 //TODO: notify better
                 showToast("Location disabled")
             }
+        }
+
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val width = displayMetrics.widthPixels
+        val frameWidth = width / DAY_LAYOUTS.size
+        val currDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1
+
+        for (i in DAY_LAYOUTS.indices) {
+            val currConstraintLayout = findViewById<ConstraintLayout>(DAY_LAYOUTS[i])
+            currConstraintLayout.layoutParams.width = frameWidth
+
+            (currConstraintLayout.getChildAt(0) as TextView).text = getDayName( ( (currDayOfWeek + i) % 7 ) + 1 )
         }
 
         sharedPreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -96,10 +109,7 @@ class MainActivity : BaseActivity() {
         }
 
         val barYSet = BarDataSet(valuesYList, "m")
-        barYSet.color = if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M )
-                            resources.getColor(R.color.color_dark_orange, theme)
-                        else
-                            resources.getColor(R.color.color_dark_orange)
+        barYSet.color = ContextCompat.getColor(this@MainActivity, R.color.color_dark_orange)
 
         val data = BarData(barYSet)
         mChart.xAxis.valueFormatter = IndexAxisValueFormatter(barEntryLabels)
@@ -132,7 +142,6 @@ class MainActivity : BaseActivity() {
     private fun updateChart() {
         MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_1 * DAYS_TO_SHOW), ::setChartValues).execute()
     }
-
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_PERMISSION_LOCATION_ID) {
@@ -246,23 +255,8 @@ class MainActivity : BaseActivity() {
         val b: Button = findViewById(R.id.reload_forecast)
 
         if(checkPermissions(REQUEST_PERMISSION_LOCATION_ID)){
-            b.visibility = View.GONE
-            val displayMetrics = DisplayMetrics()
-            windowManager.defaultDisplay.getMetrics(displayMetrics)
-
-            val width = displayMetrics.widthPixels
-            //val height = displayMetrics.heightPixels
-
-            val frameWidth = width / DAY_LAYOUTS.size
-
-            val currDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1
-
-            for (i in DAY_LAYOUTS.indices) {
-                val currConstraintLayout = findViewById<ConstraintLayout>(DAY_LAYOUTS[i])
-                currConstraintLayout.layoutParams.width = frameWidth
-
-                (currConstraintLayout.getChildAt(0) as TextView).text = getDayName( ( (currDayOfWeek + i) % 7 ) + 1 )
-            }
+            b.visibility = View.INVISIBLE
+            findViewById<LinearLayout>(R.id.mainactivity_linearlayout_forecast).visibility = View.VISIBLE
             isForecastInit = true
         }
         else{
