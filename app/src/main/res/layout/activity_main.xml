@@ -7,11 +7,12 @@
     tools:context=".MainActivity">
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/mainactivity_linearlayout_forecast"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:orientation="horizontal"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -221,24 +222,24 @@
         android:layout_height="wrap_content"
         android:textColor="@color/color_dark_teal"
         android:textSize="24sp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/mainactivity_linearlayout_forecast" />
 
     <Button
         android:id="@+id/reload_forecast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="updateForecast"
-        android:text="grant permission to see forecast"
-        android:visibility="gone"
+        android:text="@string/mainactivity_button_grant_location_permission"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.564"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.146" />
+        app:layout_constraintVertical_bias="0.065" />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/mainactivity_barchart_statistics"

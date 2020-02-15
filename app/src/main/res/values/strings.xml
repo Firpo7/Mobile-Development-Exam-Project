@@ -16,6 +16,8 @@
     <string name="mainactivity_textview_last_month">Last Month</string>
     <string name="mainactivity_textview_last_year">Last Year</string>
 
+    <string name="mainactivity_button_grant_location_permission">Grant permission to see forecasts</string>
+
     <string name="day_monday">Mon</string>
     <string name="day_tuesday">Tue</string>
     <string name="day_wednesday">Wed</string>
