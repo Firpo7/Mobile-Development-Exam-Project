@@ -22,3 +22,5 @@ fun getStepDistance(prev: Location?, new: Location): Double {
     else
         0.0
 }
+
+val DAYS_1 =  1000L * 60 * 60 * 24

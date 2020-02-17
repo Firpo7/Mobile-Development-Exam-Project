@@ -17,15 +17,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 open class BaseActivity : AppCompatActivity() {
 
-    lateinit var fusedLocationClient: FusedLocationProviderClient
-    lateinit var broadcastRec: BroadcastReceiver
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var broadcastRec: BroadcastReceiver
     protected var LOG_TAG = "BaseActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,7 +143,7 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     class MyInsertTask internal constructor(context: Context, private val stat: Stats): AsyncTask<Void?, Void?, Boolean>() {
-        var db: StatDatabase? = openDB(context)
+        private var db: StatDatabase? = openDB(context)
 
         override fun doInBackground(vararg objs: Void?): Boolean {
             db ?: return false
@@ -155,7 +154,7 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     class MyRetrieveTask internal constructor(context: Context, private val from: Date, private val callback: (stats: List<Stats> ) -> Unit): AsyncTask<Void?, Void?, List<Stats>?>() {
-        var db: StatDatabase? = openDB(context)
+        private var db: StatDatabase? = openDB(context)
 
         override fun doInBackground(vararg voids: Void?): List<Stats>? {
             return db?.statDao()?.getLastNDays(from)
@@ -183,9 +182,6 @@ open class BaseActivity : AppCompatActivity() {
         const val PREF_TIME_LAST_FORECAST = "timeLastForecast"
         const val PREF_FORECAST = "forecast"
         const val PREF_DAYS_TO_SHOW = "days_to_show"
-        const val DAYS_1 = 1000L * 60 * 60 * 24 // day in milliseconds
-
-        val sdf_statDB = SimpleDateFormat("dd-MM-yyyy", Locale.US)
 
         fun openDB(context: Context): StatDatabase? {
             return StatDatabase.getInstance(context)
