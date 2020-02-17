@@ -18,20 +18,16 @@ class QueryWeatherService {
             val client = AsyncHttpClient()
             val forecasts = ArrayList<String>()
 
-            //Log.d("LOG_RESOURCES", R.drawable.a01d.toString())
-
             client.get(urlString, object: JsonHttpResponseHandler()
             {
                 override fun onSuccess(statusCode: Int, headers: Array<Header>?, jsonObject: JSONObject?) {
                     if(jsonObject != null) {
-                        Log.d("QUERY", jsonObject.toString())
 
                         val arr = jsonObject.getJSONArray("data")
                         for ( i in 0 until arr.length())
                         {
                             val curr = arr.getJSONObject(i)
                             forecasts.add(curr.getJSONObject("weather").getString("icon"))
-                            Log.d("$i forecast result", curr.toString())
                         }
 
                         callback(forecasts)

@@ -210,38 +210,34 @@ class MainActivity : BaseActivity() {
                     lng2 = location.longitude
                 ) < MAX_DISTANCE_SAME_FORECAST
             ) {
-
                 val prefForecast = sharedPreferences.getString(PREF_FORECAST, "[]")
                 forecast.addAll(parseStringToForecastsList(prefForecast!!))
-
             }
 
             if ( forecast.isNotEmpty() ) {
                 setImageViews(forecast)
                 setSuggestionTextView(forecast[0])
+                Log.d(LOG_TAG, "doForecast(): LOADING FROM sharedPreferences")
             } else {
                 QueryWeatherService.doForecast(
                     location.latitude,
                     location.longitude
                 ) { results: ArrayList<String> ->
+                    Log.d(LOG_TAG, "doForecast(): LOADING FROM API, results: $results")
                     setImageViews(results)
                     setSuggestionTextView(results[0])
 
                     val e: SharedPreferences.Editor = sharedPreferences.edit()
                     e.putString(PREF_FORECAST, results.toString())
                     e.putLong(PREF_TIME_LAST_FORECAST, System.currentTimeMillis())
-                    Log.d("[DO_FORECAST_CALLBACK]", results.toString())
+                    e.putString(PREF_LATITUDE, location.latitude.toString())
+                    e.putString(PREF_LONGITUDE, location.longitude.toString())
                     e.apply()
                 }
             }
-
-            val e: SharedPreferences.Editor = sharedPreferences.edit()
-            e.putString(PREF_LATITUDE, location.latitude.toString())
-            e.putString(PREF_LONGITUDE, location.longitude.toString())
-            e.apply()
         }
         else{
-            Log.d("[MainActivity]","location = null")
+            Log.d(LOG_TAG,"location = null")
         }
     }
 
