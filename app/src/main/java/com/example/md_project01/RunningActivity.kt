@@ -171,14 +171,6 @@ class RunningActivity : BaseActivity() {
         val startPoint = Point(ps.longitudes[0], ps.latitudes[0], SpatialReference.create(GCS_WGS84))
         val endPoint = Point(ps.longitudes[numCoordinates - 1], ps.latitudes[numCoordinates - 1], SpatialReference.create(GCS_WGS84))
 
-        val lineSymbol = SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.WHITE, 5.0f)
-        val greenCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.GREEN, 10f)
-        val redCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 10f)
-
-        val lineGraphic = Graphic(pathLine, lineSymbol)
-        val startPointGraphic = Graphic(startPoint, greenCircleSymbol)
-        val endPointGraphic = Graphic(endPoint, redCircleSymbol)
-
         graphicsOverlay.graphics.removeAll(
             listOf(
                 lastLineGraphic,
@@ -186,17 +178,18 @@ class RunningActivity : BaseActivity() {
                 lastEndPointGraphic
             )
         )
+
+        lastLineGraphic = Graphic(pathLine, lineSymbol)
+        lastStartPointGraphic = Graphic(startPoint, greenCircleSymbol)
+        lastEndPointGraphic = Graphic(endPoint, redCircleSymbol)
+
         graphicsOverlay.graphics.addAll(
             listOf(
-                lineGraphic,
-                startPointGraphic,
-                endPointGraphic
+                lastLineGraphic,
+                lastStartPointGraphic,
+                lastEndPointGraphic
             )
         )
-
-        lastLineGraphic = lineGraphic
-        lastStartPointGraphic = startPointGraphic
-        lastEndPointGraphic = endPointGraphic
 
         val centerPoint = Point(meanLongitudes, meanLatitudes, SpatialReference.create(GCS_WGS84))
         mapView.setViewpointCenterAsync(centerPoint, 2500.0)
@@ -359,5 +352,9 @@ class RunningActivity : BaseActivity() {
         private const val GCS_WGS84 = 4326 // Geographic coordinate systems returned from a GPS device
         private val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
         private enum class ButtonState {START, STOP}
+
+        val lineSymbol = SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.WHITE, 5.0f)
+        val greenCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.GREEN, 10f)
+        val redCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 10f)
     }
 }
