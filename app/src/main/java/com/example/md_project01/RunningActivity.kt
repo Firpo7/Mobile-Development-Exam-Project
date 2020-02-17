@@ -171,19 +171,12 @@ class RunningActivity : BaseActivity() {
         meanLatitudes /= ps.latitudes.size
 
         val pathLine = Polyline(points)
-        val lineSymbol = SimpleLineSymbol(
-            SimpleLineSymbol.Style.SOLID,
-            Color.argb(255, 255, 255, 255), 5.0f
-        )
-        val startPoint =
-            Point(ps.longitudes[0], ps.latitudes[0], SpatialReference.create(GCS_WGS84))
-        val endPoint = Point(
-            ps.longitudes[numCoordinates - 1],
-            ps.latitudes[numCoordinates - 1],
-            SpatialReference.create(GCS_WGS84)
-        )
-        val greenCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 0, 255, 0), 10f)
-        val redCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(255, 255, 0, 0), 10f)
+        val startPoint = Point(ps.longitudes[0], ps.latitudes[0], SpatialReference.create(GCS_WGS84))
+        val endPoint = Point(ps.longitudes[numCoordinates - 1], ps.latitudes[numCoordinates - 1], SpatialReference.create(GCS_WGS84))
+
+        val lineSymbol = SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.WHITE, 5.0f)
+        val greenCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.GREEN, 10f)
+        val redCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 10f)
 
         val lineGraphic = Graphic(pathLine, lineSymbol)
         val startPointGraphic = Graphic(startPoint, greenCircleSymbol)
@@ -306,6 +299,13 @@ class RunningActivity : BaseActivity() {
         return ps
     }
 
+    private fun getFileNamesFromFileList(fileList: List<File>): Array<String> {
+        return Array(fileList.size) { i ->
+            val timestamp = fileList[i].name.split(".")[0].toLong()
+            sdf.format(Date(timestamp))
+        }
+    }
+
     private fun deleteSavedPath() {
         val filesToDelete = mutableSetOf<File>()
         val builder = AlertDialog.Builder(this@RunningActivity)
@@ -314,10 +314,7 @@ class RunningActivity : BaseActivity() {
         val fileList = PathTraceService.getPastPathFilesList(dir)
 
         if (fileList != null && fileList.isNotEmpty()) {
-            val fileNames = Array(fileList.size) { i ->
-                val timestamp = fileList[i].name.split(".")[0].toLong()
-                sdf.format(Date(timestamp))
-            }
+            val fileNames = getFileNamesFromFileList(fileList)
 
             builder.setMultiChoiceItems(fileNames, BooleanArray(fileList.size) { false } ) { _, which, isChecked ->
                 if (isChecked) {
@@ -328,10 +325,7 @@ class RunningActivity : BaseActivity() {
             }
 
             builder.setPositiveButton( getResourceString(R.string.delete) ) { _, _ ->
-                // user clicked OK
-                for ( f in filesToDelete) {
-                    f.delete()
-                }
+                for ( f in filesToDelete) f.delete()
             }
 
             builder.setNegativeButton( getResourceString(R.string.cancel), null)
@@ -349,10 +343,8 @@ class RunningActivity : BaseActivity() {
         val fileList = PathTraceService.getPastPathFilesList(dir)
 
         if (fileList != null && fileList.isNotEmpty()) {
-            val fileNames = Array(fileList.size) { i ->
-                val timestamp = fileList[i].name.split(".")[0].toLong()
-                sdf.format(Date(timestamp))
-            }
+            val fileNames = getFileNamesFromFileList(fileList)
+
 
             builder.setItems(fileNames) { _, which ->
                 val ps = loadPathFromJSON(fileList[which].readText())
