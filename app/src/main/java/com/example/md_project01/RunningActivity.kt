@@ -206,7 +206,6 @@ class RunningActivity : BaseActivity() {
         mapView.resume()
     }
 
-
     private fun updateDistance(distance: Double){
         distanceMade = distance
         setTextView(
@@ -214,7 +213,6 @@ class RunningActivity : BaseActivity() {
             distance.toLong().toString()
         )
     }
-
 
     fun buttonStartStop(@Suppress("UNUSED_PARAMETER") v: View) {
         currentButtonState = when(currentButtonState) {
@@ -272,10 +270,8 @@ class RunningActivity : BaseActivity() {
         }
     }
 
-
     private fun loadPathFromJSON(json: String): PathTraceService? {
         val ps = PathTraceService()
-
         val jsonObj = JSONObject(json.substring(json.indexOf("{"), json.lastIndexOf("}") + 1))
 
         try {
@@ -312,7 +308,6 @@ class RunningActivity : BaseActivity() {
         builder.setTitle( getResourceString(R.string.runningactivity_title_dialog_deletepath) )
 
         val fileList = PathTraceService.getPastPathFilesList(dir)
-
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = getFileNamesFromFileList(fileList)
 
@@ -341,16 +336,13 @@ class RunningActivity : BaseActivity() {
         builder.setTitle( getResourceString(R.string.runningactivity_title_dialog_choosepath) )
 
         val fileList = PathTraceService.getPastPathFilesList(dir)
-
         if (fileList != null && fileList.isNotEmpty()) {
             val fileNames = getFileNamesFromFileList(fileList)
 
-
             builder.setItems(fileNames) { _, which ->
                 val ps = loadPathFromJSON(fileList[which].readText())
-                if (ps != null) {
+                if (ps != null)
                     addPathLayer(ps)
-                }
             }
 
             val dialog = builder.create()
