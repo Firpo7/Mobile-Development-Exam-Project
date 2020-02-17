@@ -50,10 +50,14 @@ open class BaseActivity : AppCompatActivity() {
 
     protected fun checkPermissions(permission: Int): Boolean {
         return when(permission){
-            REQUEST_PERMISSION_READWRITE_ID -> (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-            REQUEST_PERMISSION_LOCATION_ID -> (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            REQUEST_PERMISSION_READWRITE_ID -> (
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                    )
+            REQUEST_PERMISSION_LOCATION_ID -> (
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    )
             else -> false
         }
     }
@@ -75,16 +79,6 @@ open class BaseActivity : AppCompatActivity() {
         )
     }
 
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == REQUEST_PERMISSION_LOCATION_ID) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                // Granted. Start getting the location information
-                return
-            }
-        }
-    }
-
     protected fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
@@ -101,7 +95,6 @@ open class BaseActivity : AppCompatActivity() {
                     }
                 true
             } else {
-                //TODO: show something better?
                 showToastErrorLocationDisabled()
                 false
             }
@@ -151,7 +144,6 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     class MyInsertTask internal constructor(context: Context, private val stat: Stats): AsyncTask<Void?, Void?, Boolean>() {
-        //private val activityReference: WeakReference<MainActivity> = WeakReference(context)
         var db: StatDatabase? = openDB(context)
 
         override fun doInBackground(vararg objs: Void?): Boolean {
@@ -173,7 +165,7 @@ open class BaseActivity : AppCompatActivity() {
             if (stats != null) {
                 callback(stats)
             } else {
-                Log.d("MyRetrieveTask #####", "Error while retrieving datas in DB")
+                Log.d("[MyRetrieveTask]", "Error while retrieving datas in DB")
             }
         }
 

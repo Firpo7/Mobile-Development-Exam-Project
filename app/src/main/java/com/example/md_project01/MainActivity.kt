@@ -31,8 +31,17 @@ import kotlin.random.Random
 
 class MainActivity : BaseActivity() {
 
-    private var isForecastInit = false
+    private val WEEK_DAYS = listOf(
+        R.string.day_sunday,
+        R.string.day_monday,
+        R.string.day_tuesday,
+        R.string.day_wednesday,
+        R.string.day_thursday,
+        R.string.day_friday,
+        R.string.day_saturday
+    )
     private val DAY_LAYOUTS: IntArray = intArrayOf(R.id.day0,R.id.day1,R.id.day2,R.id.day3,R.id.day4,R.id.day5,R.id.day6)
+    private var isForecastInit = false
     private lateinit var mChart: BarChart
     private var DAYS_TO_SHOW: Long = 7L
     private lateinit var sharedPreferences: SharedPreferences
@@ -48,9 +57,7 @@ class MainActivity : BaseActivity() {
             if(isLocationEnabled()){
                 showToast("Location enabled")
                 updateForecast()
-            }
-            else{
-                //TODO: notify better
+            } else {
                 showToast("Location disabled")
             }
         }
@@ -64,8 +71,7 @@ class MainActivity : BaseActivity() {
         for (i in DAY_LAYOUTS.indices) {
             val currConstraintLayout = findViewById<ConstraintLayout>(DAY_LAYOUTS[i])
             currConstraintLayout.layoutParams.width = frameWidth
-
-            (currConstraintLayout.getChildAt(0) as TextView).text = getDayName( ( (currDayOfWeek + i) % 7 ) + 1 )
+            (currConstraintLayout.getChildAt(0) as TextView).text = getDayName( (currDayOfWeek + i) % 7 )
         }
 
         sharedPreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -115,8 +121,8 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initializeChart() {
-        mChart = findViewById(R.id.mainactivity_barchart_statistics)
         val d = Description()
+        mChart = findViewById(R.id.mainactivity_barchart_statistics)
         d.text = getResourceString(R.string.no_chart_data_found)
         mChart.description = d
         mChart.description.isEnabled = false
@@ -146,16 +152,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun getDayName(i: Int): String {
-        return getResourceString( when(i) {
-            1 -> R.string.day_sunday
-            2 -> R.string.day_monday
-            3 -> R.string.day_tuesday
-            4 -> R.string.day_wednesday
-            5 -> R.string.day_thursday
-            6 -> R.string.day_friday
-            7 -> R.string.day_saturday
-            else -> R.string.day_error
-        })
+        return getResourceString(WEEK_DAYS[i])
     }
 
     private fun Context.resIdByName(resIdName: String?, resType: String): Int {
@@ -182,7 +179,6 @@ class MainActivity : BaseActivity() {
 
     private fun setSuggestionTextView(forecast: String) {
         val textView = findViewById<TextView>(R.id.mainactivity_textview_run_suggestion)
-
         setTextView(
             textView,
             when(forecast[0]){
@@ -307,4 +303,5 @@ class MainActivity : BaseActivity() {
     fun set365Days(@Suppress("UNUSED_PARAMETER")  v: View) {
         setDaysToShow(365)
     }
+
 }

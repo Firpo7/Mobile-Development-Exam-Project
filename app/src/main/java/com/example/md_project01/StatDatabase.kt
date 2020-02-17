@@ -13,8 +13,8 @@ abstract class StatDatabase : RoomDatabase() {
     abstract fun statDao(): StatsDao
 
     companion object {
-        var statDB: StatDatabase? = null
-        val DB_NAME = "stat-db"
+        private var statDB: StatDatabase? = null
+        private const val DB_NAME = "stat-db"
 
         fun getInstance(context: Context): StatDatabase? {
             if (null == statDB) {

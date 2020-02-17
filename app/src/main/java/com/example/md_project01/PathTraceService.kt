@@ -1,6 +1,5 @@
 package com.example.md_project01
 
-//import android.R
 import android.app.*
 import android.content.Intent
 import android.location.Location
@@ -22,17 +21,17 @@ class PathTraceService : Service() {
     private var locationRequest = LocationRequest()
     private var locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            super.onLocationResult(locationResult) // why? this. is. retarded. Android.
+            super.onLocationResult(locationResult)
             updateTrace(locationResult.lastLocation)
         }
     }
-    val longitudes: MutableList<Double> = mutableListOf()
-    val latitudes: MutableList<Double> = mutableListOf()
-    var distanceMade = 0.0
     private val buffer = PositionBuffer(10,5)
     private var lastLocation: Location? = null
     private lateinit var dir: String
     private var timestamp: Long = 0
+    val longitudes: MutableList<Double> = mutableListOf()
+    val latitudes: MutableList<Double> = mutableListOf()
+    var distanceMade = 0.0
 
 
     private fun createNotificationChannel() {
@@ -93,7 +92,7 @@ class PathTraceService : Service() {
         if(loc != null){
             val newDistance = addNewPoint(loc)
 
-            if(newDistance != null){ //notify to running activity
+            if(newDistance != null){ //notify new distance to running activity
                 val intent = Intent(NOTIFY)
                 intent.putExtra(EXTRA_DISTANCE, newDistance)
                 sendBroadcast(intent)
@@ -155,24 +154,17 @@ class PathTraceService : Service() {
 
 
         fun getPastPathFilesList(dir: String): List<File>? {
-            //val dir = ctx.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()
             if (checkDir(dir)) {
                 val dest = File(dir)
                 return dest.listFiles()?.filter { f ->
                     try {
                         f.name.split(".")[0].toLong()
-
-                        /*
-                         * TODO: check that files contain a valid JSON (?)
-                         */
-
                         true
                     } catch (e: NumberFormatException) {
                         false
                     }
                 }?.sorted()
             }
-
             return null
         }
 
@@ -184,7 +176,6 @@ class PathTraceService : Service() {
             return true
         }
     }
-
 }
 
 

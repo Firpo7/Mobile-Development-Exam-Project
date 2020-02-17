@@ -18,14 +18,11 @@ class QueryWeatherService {
             val client = AsyncHttpClient()
             val forecasts = ArrayList<String>()
 
-            client.get(urlString, object: JsonHttpResponseHandler()
-            {
+            client.get(urlString, object: JsonHttpResponseHandler() {
                 override fun onSuccess(statusCode: Int, headers: Array<Header>?, jsonObject: JSONObject?) {
                     if(jsonObject != null) {
-
                         val arr = jsonObject.getJSONArray("data")
-                        for ( i in 0 until arr.length())
-                        {
+                        for ( i in 0 until arr.length()) {
                             val curr = arr.getJSONObject(i)
                             forecasts.add(curr.getJSONObject("weather").getString("icon"))
                         }
@@ -38,7 +35,6 @@ class QueryWeatherService {
                     Log.e("QUERY failed", "$statusCode ${e.message}")
                 }
             })
-
         }
 
         fun doForecast(lat: Double, lon: Double, callback: (result: ArrayList<String>) -> Unit) {
@@ -46,5 +42,4 @@ class QueryWeatherService {
             performRequest(forgeURL, callback)
         }
     }
-
 }

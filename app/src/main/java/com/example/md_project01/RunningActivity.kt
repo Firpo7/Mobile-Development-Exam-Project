@@ -32,23 +32,21 @@ import org.json.JSONObject
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.locks.ReentrantLock
 
 
 class RunningActivity : BaseActivity() {
-    private var dir: String = ""
     private lateinit var locationDisplay: LocationDisplay
     private lateinit var graphicsOverlay: GraphicsOverlay
+    private lateinit var locationListener: BroadcastReceiver
+    private var dir: String = ""
     private var lastLineGraphic: Graphic? = null
     private var lastStartPointGraphic: Graphic? = null
     private var lastEndPointGraphic: Graphic? = null
     private var pathTrace: Intent? = null
-    private lateinit var locationListener: BroadcastReceiver
     private var distanceMade = 0.0
     private var wasRunning: Boolean = false
-
-    private val sharedCounterLock = ReentrantLock()
     private var currentButtonState: ButtonState = ButtonState.START
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,12 +60,11 @@ class RunningActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         
-        getLocationWithCallback { location: Location? ->
-            initializeMap(location)
+        getLocationWithCallback {
+                location: Location? -> initializeMap(location)
         }
 
         locationListener = LocationReceiver(this)
-
     }
 
     override fun onPause() {
@@ -111,7 +108,7 @@ class RunningActivity : BaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId){
+        return when(item.itemId) {
             R.id.action_show_path_histories -> {
                 showPathHistories()
                 true
@@ -241,14 +238,9 @@ class RunningActivity : BaseActivity() {
     private fun startRunning() {
         if(::locationDisplay.isInitialized) {
             if (!locationDisplay.isStarted) {
-                try {
-                    sharedCounterLock.lock()
-                    pathTrace = Intent(this, PathTraceService::class.java)
-                    pathTrace!!.putExtra(PathTraceService.EXTRA_DIR, dir)
-                    startService(pathTrace)
-                } finally {
-                    sharedCounterLock.unlock()
-                }
+                pathTrace = Intent(this, PathTraceService::class.java)
+                pathTrace!!.putExtra(PathTraceService.EXTRA_DIR, dir)
+                startService(pathTrace)
 
                 locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
                 locationDisplay.startAsync()
@@ -327,13 +319,15 @@ class RunningActivity : BaseActivity() {
 
             val dialog = builder.create()
             dialog.show()
+        } else {
+            showToast(getResourceString(R.string.runningactivity_toast_no_past_path2delete_found))
         }
 
     }
 
     private fun showPathHistories() {
         val builder = AlertDialog.Builder(this@RunningActivity)
-        builder.setTitle( getResourceString(R.string.runningactivity_title_dialog_choosepath) )
+        builder.setTitle(getResourceString(R.string.runningactivity_title_dialog_choosepath))
 
         val fileList = PathTraceService.getPastPathFilesList(dir)
         if (fileList != null && fileList.isNotEmpty()) {
@@ -348,14 +342,15 @@ class RunningActivity : BaseActivity() {
             val dialog = builder.create()
             dialog.show()
         } else {
-            showToast(getResourceString(R.string.runningactivity_toast_no_past_path_found) )
+            showToast(getResourceString(R.string.runningactivity_toast_no_past_path_found))
         }
     }
 
     class LocationReceiver(private val ra: RunningActivity) : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val dist = intent.getDoubleExtra(PathTraceService.EXTRA_DISTANCE, 0.0)
-            if(dist>0) ra.updateDistance(dist)
+            if(dist>0)
+                ra.updateDistance(dist)
         }
     }
 

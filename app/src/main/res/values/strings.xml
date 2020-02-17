@@ -7,6 +7,7 @@
     <string name="runningactivity_title_dialog_choosepath">Choose a path to load</string>
     <string name="runningactivity_title_dialog_deletepath">Choose the paths to delete</string>
     <string name="runningactivity_toast_no_past_path_found">No previous path to show</string>
+    <string name="runningactivity_toast_no_past_path2delete_found">No previous path to delete</string>
 
     <string name="mainactivity_button_start_running">START RUNNING!!</string>
     <string name="mainactivity_textview_run_suggestion_good">TODAY IS A GOOD DAY!!</string>
