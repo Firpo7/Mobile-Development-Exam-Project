@@ -167,8 +167,8 @@ class RunningActivity : BaseActivity() {
             meanLatitudes += ps.latitudes[i]
         }
 
-        meanLongitudes /= ps.longitudes.size
-        meanLatitudes /= ps.latitudes.size
+        meanLongitudes /= numCoordinates
+        meanLatitudes /= numCoordinates
 
         val pathLine = Polyline(points)
         val startPoint = Point(ps.longitudes[0], ps.latitudes[0], SpatialReference.create(GCS_WGS84))
