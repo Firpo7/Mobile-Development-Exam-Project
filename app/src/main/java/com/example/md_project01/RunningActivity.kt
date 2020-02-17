@@ -101,7 +101,8 @@ class RunningActivity : BaseActivity() {
         super.onDestroy()
         Log.d("[$LOG_TAG]", "onDestroy()")
         mapView.dispose()
-        shutdownScheduledTask()
+        if (wasRunning)
+            shutdownScheduledTask()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -124,8 +125,10 @@ class RunningActivity : BaseActivity() {
     }
 
     private fun shutdownScheduledTask() {
-        MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), distanceMade.toLong())).execute()
-        if(pathTrace != null) stopService(pathTrace)
+        if(pathTrace != null) {
+            MyInsertTask(this@RunningActivity, Stats(Date(System.currentTimeMillis()), distanceMade.toLong())).execute()
+            stopService(pathTrace)
+        }
     }
 
     private fun initializeMap(location: Location?) {
