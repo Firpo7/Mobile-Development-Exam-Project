@@ -86,24 +86,19 @@ class MainActivity : BaseActivity() {
             return
         }
         mChart.description.isEnabled = false
-        val m = mutableMapOf<String, Stats>()
-        val now = System.currentTimeMillis()
-        var tmp = now - DAYS_1 * (DAYS_TO_SHOW-1)
-        var k : String
+        var tmp = System.currentTimeMillis() - DAYS_1 * (DAYS_TO_SHOW-1)
         val valuesYList = mutableListOf<BarEntry>()
         val barEntryLabels = mutableListOf<String>()
 
-        for ( s in stats) {
-            m[sdf_statDB.format(s.date)] = s
-        }
-
+        var j = 0
         for ( i in 0 until DAYS_TO_SHOW) {
-            k = sdf_statDB.format( Date(tmp) )
+            val k = sdf_statDB.format( Date(tmp) )
             barEntryLabels.add(k)
-            if ( !m.containsKey(k) ) {
-                valuesYList.add( BarEntry(i.toFloat(), 0f ) )
+            if ( j < stats.size && sdf_statDB.format( stats[j].date ) == k ) {
+                valuesYList.add( BarEntry(i.toFloat(), stats[j].distance.toFloat()) )
+                ++j
             } else {
-                valuesYList.add( BarEntry(i.toFloat(), m[k]!!.distance.toFloat()) )
+                valuesYList.add( BarEntry(i.toFloat(), 0f ) )
             }
             tmp += DAYS_1
         }
@@ -121,7 +116,6 @@ class MainActivity : BaseActivity() {
 
     private fun initializeChart() {
         mChart = findViewById(R.id.mainactivity_barchart_statistics)
-        //mChart.setBackgroundColor(Color.WHITE)
         val d = Description()
         d.text = getResourceString(R.string.no_chart_data_found)
         mChart.description = d
@@ -289,11 +283,13 @@ class MainActivity : BaseActivity() {
     }
 
     fun insertRandomValuesInDB(@Suppress("UNUSED_PARAMETER") v: View) {
-        if (BuildConfig.DEBUG)
+        if (BuildConfig.DEBUG) {
             for (i in 0..365) {
                 val date = System.currentTimeMillis() - DAYS_1 * i
                 MyInsertTask(this@MainActivity, Stats(Date(date), abs(Random.nextLong()%1000))).execute()
             }
+            updateChart()
+        }
     }
 
     private fun setDaysToShow(value: Long) {
