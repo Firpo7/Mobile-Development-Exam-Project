@@ -137,6 +137,11 @@ class MainActivity : BaseActivity() {
         textView.visibility = View.VISIBLE
     }
 
+    private fun setForecastResults(forecast: ArrayList<String>) {
+        setImageViews(forecast)
+        setSuggestionTextView(forecast[0])
+    }
+
     private fun doForecast(location: Location?) {
         if(location != null) {
             val forecast = ArrayList<String>()
@@ -159,8 +164,7 @@ class MainActivity : BaseActivity() {
             }
 
             if ( forecast.isNotEmpty() ) {
-                setImageViews(forecast)
-                setSuggestionTextView(forecast[0])
+                setForecastResults(forecast)
                 Log.d(LOG_TAG, "doForecast(): LOADING FROM sharedPreferences")
             } else {
                 QueryWeatherService.doForecast(
@@ -168,8 +172,7 @@ class MainActivity : BaseActivity() {
                     location.longitude
                 ) { results: ArrayList<String> ->
                     Log.d(LOG_TAG, "doForecast(): LOADING FROM API, results: $results")
-                    setImageViews(results)
-                    setSuggestionTextView(results[0])
+                    setForecastResults(results)
 
                     val e: SharedPreferences.Editor = sharedPreferences.edit()
                     e.putString(PREF_FORECAST, results.toString())
