@@ -319,6 +319,10 @@ class RunningActivity : BaseActivity() {
     }
 
     private fun showPathHistories() {
+        if (::locationDisplay.isInitialized && locationDisplay.isStarted) {
+            showToast(getResourceString(R.string.runningactivity_toast_load_path_while_running))
+            return
+        }
         val builder = AlertDialog.Builder(this@RunningActivity)
         builder.setTitle(getResourceString(R.string.runningactivity_title_dialog_choosepath))
 
