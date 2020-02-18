@@ -19,9 +19,6 @@ class MapViewWrapper(private val mapView: MapView) {
 
     private var graphicsOverlay: GraphicsOverlay
     private var locationDisplay: LocationDisplay
-    private var lastLineGraphic: Graphic? = null
-    private var lastStartPointGraphic: Graphic? = null
-    private var lastEndPointGraphic: Graphic? = null
 
     init {
         locationDisplay = mapView.locationDisplay
@@ -58,35 +55,25 @@ class MapViewWrapper(private val mapView: MapView) {
 
         removeAllGraphics()
 
-        lastLineGraphic = Graphic(pathLine, lineSymbol)
-        lastStartPointGraphic = Graphic(startPoint, greenCircleSymbol)
-        lastEndPointGraphic = Graphic(endPoint, redCircleSymbol)
-
-        addAllGraphics()
+        addAllGraphics(
+            listOf(
+                Graphic(pathLine, lineSymbol),
+                Graphic(startPoint, greenCircleSymbol),
+                Graphic(endPoint, redCircleSymbol)
+            )
+        )
 
         val centerPoint = Point(meanLongitudes, meanLatitudes, spatialReference)
         mapView.setViewpointCenterAsync(centerPoint, 2500.0)
         mapView.resume()
     }
 
-    private fun addAllGraphics() {
-        graphicsOverlay.graphics.addAll(
-            listOf(
-                lastLineGraphic,
-                lastStartPointGraphic,
-                lastEndPointGraphic
-            )
-        )
+    private fun addAllGraphics(graphicList: List<Graphic>) {
+        graphicsOverlay.graphics.addAll(graphicList)
     }
 
     private fun removeAllGraphics() {
-        graphicsOverlay.graphics.removeAll(
-            listOf(
-                lastLineGraphic,
-                lastStartPointGraphic,
-                lastEndPointGraphic
-            )
-        )
+        graphicsOverlay.graphics.clear()
     }
 
     fun dispose() {
