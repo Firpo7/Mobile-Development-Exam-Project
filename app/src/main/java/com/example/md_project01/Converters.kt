@@ -14,6 +14,7 @@ class Converters {
     fun dateToDayString(date: Date): String? {
         return sdf.format(date)
     }
+
     companion object {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     }
