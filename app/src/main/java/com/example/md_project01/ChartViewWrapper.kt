@@ -13,7 +13,6 @@ import java.util.*
 class ChartViewWrapper(private val barChart: BarChart, private val barColor: Int) {
 
     init {
-        barChart.description.isEnabled = false
         barChart.legend.isEnabled = false
         barChart.setTouchEnabled(false)
         barChart.axisLeft.setDrawLabels(false)
@@ -27,7 +26,7 @@ class ChartViewWrapper(private val barChart: BarChart, private val barColor: Int
         barChart.data = makeBarData()
     }
 
-    fun setChartValues(stats: List<Stats>, daysToShow: Int) {
+    fun setChartValues(daysToShow: Int, stats: List<Stats> = listOf()) {
         var tmp = System.currentTimeMillis() - DAYS_1 * (daysToShow-1)
         val valuesYList = mutableListOf<BarEntry>()
         val barEntryLabels = mutableListOf<String>()

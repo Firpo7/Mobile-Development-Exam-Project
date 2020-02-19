@@ -85,14 +85,15 @@ class MainActivity : BaseActivity() {
     private fun setChartValues(stats: List<Stats>) {
         if ( stats.isEmpty() ){
             barChartViewWrapper.setBarChartDescription(true)
+            barChartViewWrapper.setChartValues(DAYS_TO_SHOW)
             return
         }
         barChartViewWrapper.setBarChartDescription(false)
-        barChartViewWrapper.setChartValues(stats, DAYS_TO_SHOW)
+        barChartViewWrapper.setChartValues(DAYS_TO_SHOW, stats)
     }
 
     private fun updateChart() {
-        MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_1 * DAYS_TO_SHOW), ::setChartValues).execute()
+        MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_1 * DAYS_TO_SHOW)) { setChartValues(it) }.execute()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
