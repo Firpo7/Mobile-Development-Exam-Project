@@ -16,13 +16,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.components.Description
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
@@ -41,15 +34,16 @@ class MainActivity : BaseActivity() {
         R.string.day_saturday
     )
     private val DAY_LAYOUTS: IntArray = intArrayOf(R.id.day0,R.id.day1,R.id.day2,R.id.day3,R.id.day4,R.id.day5,R.id.day6)
+    private var DAYS_TO_SHOW = 7
     private var isForecastInit = false
-    private lateinit var mChart: BarChart
-    private var DAYS_TO_SHOW: Long = 7L
+    private lateinit var barChartViewWrapper: ChartViewWrapper
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         super.LOG_TAG = "MainActivity"
+        sharedPreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
         if (BuildConfig.DEBUG) findViewById<Button>(R.id.mainactivity_populate_stat_db).visibility = View.VISIBLE
 
@@ -64,8 +58,7 @@ class MainActivity : BaseActivity() {
 
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val width = displayMetrics.widthPixels
-        val frameWidth = width / DAY_LAYOUTS.size
+        val frameWidth = displayMetrics.widthPixels / DAY_LAYOUTS.size
         val currDayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1
 
         for (i in DAY_LAYOUTS.indices) {
@@ -74,11 +67,14 @@ class MainActivity : BaseActivity() {
             (currConstraintLayout.getChildAt(0) as TextView).text = getDayName( (currDayOfWeek + i) % 7 )
         }
 
-        sharedPreferences = getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        DAYS_TO_SHOW = sharedPreferences.getLong(PREF_DAYS_TO_SHOW, DAYS_TO_SHOW)
+        barChartViewWrapper = ChartViewWrapper(
+            findViewById(R.id.mainactivity_barchart_statistics),
+            ContextCompat.getColor(this@MainActivity, R.color.color_dark_orange)
+        )
+        barChartViewWrapper.setDescriptionText(getResourceString(R.string.no_chart_data_found))
+        DAYS_TO_SHOW = sharedPreferences.getInt(PREF_DAYS_TO_SHOW, DAYS_TO_SHOW)
 
         updateForecast()
-        initializeChart()
     }
 
     override fun onStart() {
@@ -88,59 +84,16 @@ class MainActivity : BaseActivity() {
 
     private fun setChartValues(stats: List<Stats>) {
         if ( stats.isEmpty() ){
-            mChart.description.isEnabled = true
+            barChartViewWrapper.setBarChartDescription(true)
+            barChartViewWrapper.setChartValues(DAYS_TO_SHOW)
             return
         }
-        mChart.description.isEnabled = false
-        var tmp = System.currentTimeMillis() - DAYS_1 * (DAYS_TO_SHOW-1)
-        val valuesYList = mutableListOf<BarEntry>()
-        val barEntryLabels = mutableListOf<String>()
-
-        var j = 0
-        for ( i in 0 until DAYS_TO_SHOW) {
-            val k = sdf_statDB.format( Date(tmp) )
-            barEntryLabels.add(k)
-            if ( j < stats.size && sdf_statDB.format( stats[j].date ) == k ) {
-                valuesYList.add( BarEntry(i.toFloat(), stats[j].distance.toFloat()) )
-                ++j
-            } else {
-                valuesYList.add( BarEntry(i.toFloat(), 0f ) )
-            }
-            tmp += DAYS_1
-        }
-
-        val barYSet = BarDataSet(valuesYList, "m")
-        barYSet.color = ContextCompat.getColor(this@MainActivity, R.color.color_dark_orange)
-
-        val data = BarData(barYSet)
-        mChart.xAxis.valueFormatter = IndexAxisValueFormatter(barEntryLabels)
-        mChart.data = data
-
-        mChart.notifyDataSetChanged()
-        mChart.invalidate()
-    }
-
-    private fun initializeChart() {
-        val d = Description()
-        mChart = findViewById(R.id.mainactivity_barchart_statistics)
-        d.text = getResourceString(R.string.no_chart_data_found)
-        mChart.description = d
-        mChart.description.isEnabled = false
-        mChart.legend.isEnabled = false
-        mChart.setTouchEnabled(false)
-        mChart.axisLeft.setDrawLabels(false)
-        mChart.animateY(500)
-
-        val xAxis = mChart.xAxis
-        xAxis.textSize = 9f
-        xAxis.position = XAxis.XAxisPosition.BOTTOM
-        xAxis.setDrawGridLines(false)
-
-        mChart.data = BarData()
+        barChartViewWrapper.setBarChartDescription(false)
+        barChartViewWrapper.setChartValues(DAYS_TO_SHOW, stats)
     }
 
     private fun updateChart() {
-        MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_1 * DAYS_TO_SHOW), ::setChartValues).execute()
+        MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_1 * DAYS_TO_SHOW)) { setChartValues(it) }.execute()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -189,6 +142,11 @@ class MainActivity : BaseActivity() {
         textView.visibility = View.VISIBLE
     }
 
+    private fun setForecastResults(forecast: ArrayList<String>) {
+        setImageViews(forecast)
+        setSuggestionTextView(forecast[0])
+    }
+
     private fun doForecast(location: Location?) {
         if(location != null) {
             val forecast = ArrayList<String>()
@@ -211,8 +169,7 @@ class MainActivity : BaseActivity() {
             }
 
             if ( forecast.isNotEmpty() ) {
-                setImageViews(forecast)
-                setSuggestionTextView(forecast[0])
+                setForecastResults(forecast)
                 Log.d(LOG_TAG, "doForecast(): LOADING FROM sharedPreferences")
             } else {
                 QueryWeatherService.doForecast(
@@ -220,8 +177,7 @@ class MainActivity : BaseActivity() {
                     location.longitude
                 ) { results: ArrayList<String> ->
                     Log.d(LOG_TAG, "doForecast(): LOADING FROM API, results: $results")
-                    setImageViews(results)
-                    setSuggestionTextView(results[0])
+                    setForecastResults(results)
 
                     val e: SharedPreferences.Editor = sharedPreferences.edit()
                     e.putString(PREF_FORECAST, results.toString())
@@ -284,10 +240,10 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun setDaysToShow(value: Long) {
+    private fun setDaysToShow(value: Int) {
         DAYS_TO_SHOW = value
         val e = sharedPreferences.edit()
-        e.putLong(PREF_DAYS_TO_SHOW, DAYS_TO_SHOW)
+        e.putInt(PREF_DAYS_TO_SHOW, DAYS_TO_SHOW)
         e.apply()
         updateChart()
     }

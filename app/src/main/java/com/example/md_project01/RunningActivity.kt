@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.os.Environment
@@ -15,18 +14,6 @@ import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import com.esri.arcgisruntime.geometry.Point
-import com.esri.arcgisruntime.geometry.PointCollection
-import com.esri.arcgisruntime.geometry.Polyline
-import com.esri.arcgisruntime.geometry.SpatialReference
-import com.esri.arcgisruntime.mapping.ArcGISMap
-import com.esri.arcgisruntime.mapping.Basemap
-import com.esri.arcgisruntime.mapping.view.Graphic
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay
-import com.esri.arcgisruntime.mapping.view.LocationDisplay
-import com.esri.arcgisruntime.mapping.view.WrapAroundMode
-import com.esri.arcgisruntime.symbology.SimpleLineSymbol
-import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol
 import kotlinx.android.synthetic.main.content_running.*
 import org.json.JSONObject
 import java.io.File
@@ -35,17 +22,13 @@ import java.util.*
 
 
 class RunningActivity : BaseActivity() {
-    private lateinit var locationDisplay: LocationDisplay
-    private lateinit var graphicsOverlay: GraphicsOverlay
     private lateinit var locationListener: BroadcastReceiver
     private var dir: String = ""
-    private var lastLineGraphic: Graphic? = null
-    private var lastStartPointGraphic: Graphic? = null
-    private var lastEndPointGraphic: Graphic? = null
     private var pathTrace: Intent? = null
     private var distanceMade = 0.0
     private var wasRunning: Boolean = false
     private var currentButtonState: ButtonState = ButtonState.START
+    private lateinit var mv: MapViewWrapper
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +47,8 @@ class RunningActivity : BaseActivity() {
                 location: Location? -> initializeMap(location)
         }
 
+        mv = MapViewWrapper(mapView)
+
         locationListener = LocationReceiver(this)
     }
 
@@ -71,7 +56,7 @@ class RunningActivity : BaseActivity() {
         super.onPause()
         Log.d("[$LOG_TAG]", "onPause()")
         unregisterReceiver(locationListener)
-        mapView.pause()
+        mv.pause()
     }
 
     override fun onResume() {
@@ -79,25 +64,23 @@ class RunningActivity : BaseActivity() {
         Log.d("[$LOG_TAG]", "onResume()")
         registerReceiver(locationListener, IntentFilter(PathTraceService.NOTIFY))
         if (wasRunning) {
-            wasRunning = false
-            locationDisplay.startAsync()
+            mv.startLocationDisplay()
         }
-        mapView.resume()
+        mv.resume()
     }
 
     override fun onStop() {
         super.onStop()
         Log.d("[$LOG_TAG]", "onStop()")
-        if (::locationDisplay.isInitialized && locationDisplay.isStarted) {
-            wasRunning = true
-            locationDisplay.stop()
+        if (wasRunning) {
+            mv.stopLocationDisplay()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d("[$LOG_TAG]", "onDestroy()")
-        mapView.dispose()
+        mv.dispose()
         if (wasRunning)
             shutdownScheduledTask()
     }
@@ -129,71 +112,21 @@ class RunningActivity : BaseActivity() {
     }
 
     private fun initializeMap(location: Location?) {
-        var lat = 0.0
-        var lon = 0.0
         if (location != null) {
-            lat = location.latitude
-            lon = location.longitude
+            mv.initializeMap(location.latitude, location.longitude)
         } else {
             showToastErrorLocationDisabled()
+            mv.initializeMap(0.0, 0.0)
         }
-        val map = ArcGISMap(Basemap.Type.DARK_GRAY_CANVAS_VECTOR, lat, lon, 18)
-        mapView.map = map
-
-        graphicsOverlay = GraphicsOverlay()
-        mapView!!.graphicsOverlays.add(graphicsOverlay)
-
-        mapView.wrapAroundMode = WrapAroundMode.DISABLED
-        locationDisplay = mapView.locationDisplay
     }
 
-    private fun addPathLayer(ps: PathTraceService) {
-        val points = PointCollection(SpatialReference.create(GCS_WGS84))
-        var meanLongitudes = 0.0
-        var meanLatitudes = 0.0
-        val numCoordinates = ps.latitudes.size
-
+    private fun loadPastPath(ps: PathTraceService) {
         setTextView(
             findViewById(R.id.runningactivity_textview_distance),
             ps.distanceMade.toLong().toString()
         )
 
-        for (i in 0 until numCoordinates) {
-            points.add(ps.longitudes[i], ps.latitudes[i])
-            meanLongitudes += ps.longitudes[i]
-            meanLatitudes += ps.latitudes[i]
-        }
-
-        meanLongitudes /= numCoordinates
-        meanLatitudes /= numCoordinates
-
-        val pathLine = Polyline(points)
-        val startPoint = Point(ps.longitudes[0], ps.latitudes[0], SpatialReference.create(GCS_WGS84))
-        val endPoint = Point(ps.longitudes[numCoordinates - 1], ps.latitudes[numCoordinates - 1], SpatialReference.create(GCS_WGS84))
-
-        graphicsOverlay.graphics.removeAll(
-            listOf(
-                lastLineGraphic,
-                lastStartPointGraphic,
-                lastEndPointGraphic
-            )
-        )
-
-        lastLineGraphic = Graphic(pathLine, lineSymbol)
-        lastStartPointGraphic = Graphic(startPoint, greenCircleSymbol)
-        lastEndPointGraphic = Graphic(endPoint, redCircleSymbol)
-
-        graphicsOverlay.graphics.addAll(
-            listOf(
-                lastLineGraphic,
-                lastStartPointGraphic,
-                lastEndPointGraphic
-            )
-        )
-
-        val centerPoint = Point(meanLongitudes, meanLatitudes, SpatialReference.create(GCS_WGS84))
-        mapView.setViewpointCenterAsync(centerPoint, 2500.0)
-        mapView.resume()
+        mv.addPathLayer(ps)
     }
 
     private fun updateDistance(distance: Double){
@@ -229,29 +162,27 @@ class RunningActivity : BaseActivity() {
     }
 
     private fun startRunning() {
-        if(::locationDisplay.isInitialized) {
-            if (!locationDisplay.isStarted) {
-                pathTrace = Intent(this, PathTraceService::class.java)
-                pathTrace!!.putExtra(PathTraceService.EXTRA_DIR, dir)
-                startService(pathTrace)
+        if(!wasRunning) {
+            pathTrace = Intent(this, PathTraceService::class.java)
+            pathTrace!!.putExtra(PathTraceService.EXTRA_DIR, dir)
+            startService(pathTrace)
 
-                locationDisplay.autoPanMode = LocationDisplay.AutoPanMode.RECENTER
-                locationDisplay.startAsync()
-                setTextView(
-                    findViewById(R.id.runningactivity_textview_distance),
-                    "0"
-                )
-            }
-        } else {
-            //TODO: do something better
-            showToastErrorLocationDisabled()
+            wasRunning = true
+
+            mv.startLocationDisplay()
+            setTextView(
+                findViewById(R.id.runningactivity_textview_distance),
+                "0"
+            )
+
         }
     }
 
     private fun stopRunning() {
-        if (::locationDisplay.isInitialized && locationDisplay.isStarted) {
+        if (wasRunning) {
+            wasRunning = false
             shutdownScheduledTask()
-            locationDisplay.stop()
+            mv.stopLocationDisplay()
         }
     }
 
@@ -315,11 +246,10 @@ class RunningActivity : BaseActivity() {
         } else {
             showToast(getResourceString(R.string.runningactivity_toast_no_past_path2delete_found))
         }
-
     }
 
     private fun showPathHistories() {
-        if (::locationDisplay.isInitialized && locationDisplay.isStarted) {
+        if (wasRunning) {
             showToast(getResourceString(R.string.runningactivity_toast_load_path_while_running))
             return
         }
@@ -333,7 +263,7 @@ class RunningActivity : BaseActivity() {
             builder.setItems(fileNames) { _, which ->
                 val ps = loadPathFromJSON(fileList[which].readText())
                 if (ps != null)
-                    addPathLayer(ps)
+                    loadPastPath(ps)
             }
 
             val dialog = builder.create()
@@ -353,12 +283,7 @@ class RunningActivity : BaseActivity() {
 
 
     companion object {
-        private const val GCS_WGS84 = 4326 // Geographic coordinate systems returned from a GPS device
         private val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
         private enum class ButtonState {START, STOP}
-
-        val lineSymbol = SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.WHITE, 5.0f)
-        val greenCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.GREEN, 10f)
-        val redCircleSymbol = SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 10f)
     }
 }
