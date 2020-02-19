@@ -170,10 +170,7 @@ class PathTraceService : Service() {
 
         private fun checkDir(dir: String): Boolean {
             val saveDir = File(dir)
-            if (!saveDir.exists()) {
-                return saveDir.mkdir()
-            }
-            return true
+            return if (!saveDir.exists()) saveDir.mkdir() else true
         }
     }
 }
