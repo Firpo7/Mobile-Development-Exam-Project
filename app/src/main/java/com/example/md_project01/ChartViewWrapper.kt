@@ -23,6 +23,9 @@ class ChartViewWrapper(private val barChart: BarChart, private val barColor: Int
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.setDrawGridLines(false)
 
+        barChart.axisRight.axisMinimum = 0f
+        barChart.axisLeft.axisMinimum = 0f
+
         barChart.data = makeBarData()
     }
 
