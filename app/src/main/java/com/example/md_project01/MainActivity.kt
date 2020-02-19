@@ -34,6 +34,7 @@ class MainActivity : BaseActivity() {
         R.string.day_saturday
     )
     private val DAY_LAYOUTS: IntArray = intArrayOf(R.id.day0,R.id.day1,R.id.day2,R.id.day3,R.id.day4,R.id.day5,R.id.day6)
+    private var DAYS_TO_SHOW = 7
     private var isForecastInit = false
     private lateinit var barChartViewWrapper: ChartViewWrapper
     private lateinit var sharedPreferences: SharedPreferences
@@ -66,9 +67,12 @@ class MainActivity : BaseActivity() {
             (currConstraintLayout.getChildAt(0) as TextView).text = getDayName( (currDayOfWeek + i) % 7 )
         }
 
-        barChartViewWrapper = ChartViewWrapper(findViewById(R.id.mainactivity_barchart_statistics), ContextCompat.getColor(this@MainActivity, R.color.color_dark_orange))
+        barChartViewWrapper = ChartViewWrapper(
+            findViewById(R.id.mainactivity_barchart_statistics),
+            ContextCompat.getColor(this@MainActivity, R.color.color_dark_orange)
+        )
         barChartViewWrapper.setDescriptionText(getResourceString(R.string.no_chart_data_found))
-        barChartViewWrapper.DAYS_TO_SHOW = sharedPreferences.getLong(PREF_DAYS_TO_SHOW, barChartViewWrapper.DAYS_TO_SHOW)
+        DAYS_TO_SHOW = sharedPreferences.getInt(PREF_DAYS_TO_SHOW, DAYS_TO_SHOW)
 
         updateForecast()
     }
@@ -84,11 +88,11 @@ class MainActivity : BaseActivity() {
             return
         }
         barChartViewWrapper.setBarChartDescription(false)
-        barChartViewWrapper.setChartValues(stats)
+        barChartViewWrapper.setChartValues(stats, DAYS_TO_SHOW)
     }
 
     private fun updateChart() {
-        MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_1 * barChartViewWrapper.DAYS_TO_SHOW), ::setChartValues).execute()
+        MyRetrieveTask(this@MainActivity, Date(System.currentTimeMillis() - DAYS_1 * DAYS_TO_SHOW), ::setChartValues).execute()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -235,10 +239,10 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun setDaysToShow(value: Long) {
-        barChartViewWrapper.DAYS_TO_SHOW = value
+    private fun setDaysToShow(value: Int) {
+        DAYS_TO_SHOW = value
         val e = sharedPreferences.edit()
-        e.putLong(PREF_DAYS_TO_SHOW, barChartViewWrapper.DAYS_TO_SHOW)
+        e.putInt(PREF_DAYS_TO_SHOW, DAYS_TO_SHOW)
         e.apply()
         updateChart()
     }

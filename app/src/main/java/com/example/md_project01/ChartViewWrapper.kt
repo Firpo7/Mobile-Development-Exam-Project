@@ -12,8 +12,6 @@ import java.util.*
 
 class ChartViewWrapper(private val barChart: BarChart, private val barColor: Int) {
 
-    var DAYS_TO_SHOW: Long = 7L
-
     init {
         barChart.description.isEnabled = false
         barChart.legend.isEnabled = false
@@ -29,13 +27,13 @@ class ChartViewWrapper(private val barChart: BarChart, private val barColor: Int
         barChart.data = makeBarData()
     }
 
-    fun setChartValues(stats: List<Stats>) {
-        var tmp = System.currentTimeMillis() - DAYS_1 * (DAYS_TO_SHOW-1)
+    fun setChartValues(stats: List<Stats>, daysToShow: Int) {
+        var tmp = System.currentTimeMillis() - DAYS_1 * (daysToShow-1)
         val valuesYList = mutableListOf<BarEntry>()
         val barEntryLabels = mutableListOf<String>()
 
         var j = 0
-        for ( i in 0 until DAYS_TO_SHOW) {
+        for ( i in 0 until daysToShow) {
             val k = sdf_chart.format( Date(tmp) )
             barEntryLabels.add(k)
             if ( j < stats.size && sdf_chart.format( stats[j].date ) == k ) {
